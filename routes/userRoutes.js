@@ -5,6 +5,8 @@ const userRouter = express.Router();
 
 userRouter.post("/register", userController.postUser);
 userRouter.get("/login", userController.login);
+
 userRouter.get("/users", [authMiddleware.secureRoute], userController.getUser);
+userRouter.put("/user/:id", [authMiddleware.secureRoute], userController.putUser)
 
 module.exports = userRouter;
