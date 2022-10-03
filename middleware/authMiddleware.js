@@ -35,7 +35,7 @@ function getUser(req, res) {
 
   // decode token
   const payload = jwt.decodeToken(token);
-  //console.log(payload);
+  console.log(payload);
 
   return payload;
 }

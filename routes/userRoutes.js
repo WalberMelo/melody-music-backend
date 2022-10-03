@@ -4,11 +4,25 @@ const authMiddleware = require("../middleware/authMiddleware");
 const userRouter = express.Router();
 
 userRouter.post("/register", userController.postUser);
+
 userRouter.get("/login", userController.login);
+userRouter.get("/user", [authMiddleware.secureRoute], userController.getUser);
+userRouter.get(
+  "/users",
+  [authMiddleware.secureRoute],
+  userController.getAllUser
+);
 
-userRouter.get("/users", [authMiddleware.secureRoute], userController.getUser);
-userRouter.put("/user/:id", [authMiddleware.secureRoute], userController.putUser);
+userRouter.put(
+  "/user/:id",
+  [authMiddleware.secureRoute],
+  userController.putUser
+);
 
-userRouter.delete("/user/:id", [authMiddleware.secureRoute], userController.deleteUser);
+userRouter.delete(
+  "/user/:id",
+  [authMiddleware.secureRoute],
+  userController.deleteUser
+);
 
 module.exports = userRouter;

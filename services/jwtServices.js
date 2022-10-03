@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken");
 
 function createToken(user, expiresIn) {
-  //Get id and email from user object
-  const { id, email } = user;
+  //Get id, email, isAdmin boolean from user object
+  const { id, email, isAdmin } = user;
 
   //Payload. The second part of the token is the payload
-  const payload = { id, email };
+  const payload = { id, email, isAdmin };
 
   return jwt.sign(payload, process.env.JWT_SECRET_KEY, {
     expiresIn: expiresIn,

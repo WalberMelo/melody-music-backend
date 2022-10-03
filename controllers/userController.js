@@ -1,9 +1,6 @@
 const jwt = require("../services/jwtServices");
 const bcryptjs = require("bcryptjs");
-const {
-  User,
-  validate
-} = require("../models/userModel");
+const { User, validate } = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
 
 async function postUser(req, res) {
@@ -12,25 +9,28 @@ async function postUser(req, res) {
   const user = new User(params.value);
 
   try {
-    if (params.error) throw {
-      msg: `${params.error}`
-    };
+    if (params.error)
+      throw {
+        msg: `${params.error}`,
+      };
     //require email and password
-    if (!params.value.email) throw {
-      msg: "Error: email can not be null"
-    };
+    if (!params.value.email)
+      throw {
+        msg: "Error: email can not be null",
+      };
     if (!params.value.password)
       throw {
-        msg: "Error: password can not be null"
+        msg: "Error: password can not be null",
       };
 
     //Avoid duplicated emails
     const emailExists = await User.findOne({
-      email: params.value.email
+      email: params.value.email,
     });
-    if (emailExists) throw {
-      msg: "Email already exists"
-    };
+    if (emailExists)
+      throw {
+        msg: "Email already exists",
+      };
 
     // encrypting password
     const salt = bcryptjs.genSaltSync(10);
@@ -38,7 +38,7 @@ async function postUser(req, res) {
 
     user.save();
     res.status(201).send({
-      user: user
+      user: user,
     });
   } catch (error) {
     res.status(500).send(error);
@@ -46,67 +46,102 @@ async function postUser(req, res) {
 }
 
 async function login(req, res) {
-  const {
-    email,
-    password
-  } = req.body;
+  const { email, password } = req.body;
   try {
-    User.findOne({
-      email: email
-    }, async (err, userData) => {
-      if (err) {
-        res.status(500).send({
-          msg: "Server status error"
-        });
-      } else {
-        if (!userData) {
-          res.status(400).send({
-            msg: "Error: email doesn't exists"
+    User.findOne(
+      {
+        email: email,
+      },
+      async (err, userData) => {
+        if (err) {
+          res.status(500).send({
+            msg: "Server status error",
           });
         } else {
-          //Check if password match the encrypted pwr
-          const passwordCorrect = await bcryptjs.compare(
-            password,
-            userData.password
-          );
-          if (!passwordCorrect) {
-            res.status(403).send({
-              msg: "Error incorrect password"
+          if (!userData) {
+            res.status(400).send({
+              msg: "Error: email doesn't exists",
             });
           } else {
-            //Create token with 24h of validation establish in createToken func. in jwtServices.js
-            const token = await jwt.createToken(userData, "24h");
-            res.status(200).send({
-              token: token
-            });
+            //Check if password match the encrypted pwr
+            const passwordCorrect = await bcryptjs.compare(
+              password,
+              userData.password
+            );
+            if (!passwordCorrect) {
+              res.status(403).send({
+                msg: "Error incorrect password",
+              });
+            } else {
+              //Create token with 24h of validation establish in createToken func. in jwtServices.js
+              const token = await jwt.createToken(userData, "24h");
+              res.status(200).send({
+                token: token,
+              });
+            }
           }
         }
       }
-    });
+    );
   } catch (error) {
     req.status(500).send(error);
   }
 }
 
-//? Get user profile information
+async function getAllUser(req, res) {
+  const user_token = await authMiddleware.getUser(req, res);
+
+  try {
+    const users = await User.find();
+    console.log(users);
+
+    if (!users) {
+      res.status(404).send({
+        msg: "Error: user doesn't exist",
+      });
+    } else if (!user_token.isAdmin) {
+      res.status(403).send({
+        msg: "Forbidden -- Access to this resource on the server is denied!",
+      });
+    } else if (user_token.isAdmin) {
+      //remove password for security reasons
+      users.password = null;
+      res.status(200).send({
+        users: users,
+      });
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
+
 async function getUser(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
-  //console.log(user_token);
+  console.log(user_token);
+
+  //if user_token.isAdmin || user._id === user_token.id are able to perform CRUD
   try {
     const user = await User.findById(user_token.id);
+
     if (!user) {
       res.status(404).send({
-        msg: "Error: user doesn't exist"
+        msg: "Error: user doesn't exist",
       });
     } else if (user._id != user_token.id) {
       res.status(403).send({
         msg: "Forbiden -- Access to this resource on the server is denied!",
       });
-    } else {
+    } else if (user_token.isAdmin && user._id === user_token.id) {
       //remove password for security reasons
       user.password = null;
       res.status(200).send({
-        user: user
+        user: user,
+      });
+    } else if (user._id === user_token.id) {
+      //remove password for security reasons
+      user.password = null;
+      res.status(200).send({
+        user: user,
       });
     }
   } catch (error) {
@@ -120,26 +155,24 @@ async function putUser(req, res) {
   const userId = req.params.id;
   const params = req.body;
   const user_token = await authMiddleware.getUser(req, res);
-  
+
   try {
     //get the user
     User.findById(userId, async (err, userData) => {
-     
       if (err) {
         res.status(500).send({
-          msg: "Server status error"
+          msg: "Server status error",
         });
       } else {
         //if ther is no data or it is not foun trhw error
         if (!userData) {
           res.status(404).send({
-            msg: "Error: User not found"
+            msg: "Error: User not found",
           });
         } else if (user_token.id !== userData._id.valueOf()) {
           res.status(403).send({
-          
-            msg: "Error: unauthorized request"
-          }); ;
+            msg: "Error: unauthorized request",
+          });
         } else {
           const salt = bcryptjs.genSaltSync(10);
           // replace old info with the new info received
@@ -159,15 +192,15 @@ async function putUser(req, res) {
       User.findByIdAndUpdate(userId, userData, (err, result) => {
         if (err) {
           res.status(500).send({
-            msg: "Server status error"
+            msg: "Server status error",
           });
         } else if (!result) {
           res.status(404).send({
-            msg: "Error: user doesn't exists"
+            msg: "Error: user doesn't exists",
           });
         } else {
           res.status(201).send({
-            user: userData
+            user: userData,
           });
         }
       });
@@ -205,6 +238,7 @@ module.exports = {
   postUser,
   login,
   getUser,
+  getAllUser,
   putUser,
-  deleteUser
+  deleteUser,
 };
