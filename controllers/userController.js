@@ -177,9 +177,34 @@ async function putUser(req, res) {
   }
 }
 
+async function deleteUser(req, res) {
+  const user_token = await authMiddleware.getUser(req, res);
+  const userId = req.params.id;
+  try {
+    User.findById(userId, (err, userData) => {
+      if (err) {
+        res.status(500).send({ msg: "Server status error" });
+      } else if (user_token.id !== userData.id.valueOf()) {
+        res.status(403).send({ msg: "Error: unauthorized request" });
+      }
+      User.findByIdAndDelete(userId, (err, result) => {
+        if (err) {
+          res.status(500).send({ msg: "Server status error" });
+        } else if (!result) {
+          res.status(404).send({ msg: "Error: User doesn't exist" });
+        }
+        res.status(200).send({ masg: "User deleted succesfully" });
+      });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: "Server status error" });
+  }
+}
+
 module.exports = {
   postUser,
   login,
   getUser,
-  putUser
+  putUser,
+  deleteUser
 };
