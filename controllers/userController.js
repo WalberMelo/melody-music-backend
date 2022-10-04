@@ -88,33 +88,6 @@ async function login(req, res) {
   }
 }
 
-async function getAllUser(req, res) {
-  const user_token = await authMiddleware.getUser(req, res);
-
-  try {
-    const users = await User.find();
-    console.log(users);
-
-    if (!users) {
-      res.status(404).send({
-        msg: "Error: user doesn't exist",
-      });
-    } else if (!user_token.isAdmin) {
-      res.status(403).send({
-        msg: "Forbidden -- Access to this resource on the server is denied!",
-      });
-    } else if (user_token.isAdmin) {
-      //remove password for security reasons
-      users.password = null;
-      res.status(200).send({
-        users: users,
-      });
-    }
-  } catch (error) {
-    res.status(500).send(error);
-  }
-}
-
 async function getUser(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   console.log(user_token);
@@ -232,7 +205,6 @@ module.exports = {
   postUser,
   login,
   getUser,
-  getAllUser,
   putUser,
   deleteUser,
 };
