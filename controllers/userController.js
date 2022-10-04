@@ -119,9 +119,9 @@ async function getUser(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   console.log(user_token);
 
-  //if user_token.isAdmin || user._id === user_token.id are able to perform CRUD
   try {
     const user = await User.findById(user_token.id);
+    console.log(user);
 
     if (!user) {
       res.status(404).send({
@@ -131,13 +131,7 @@ async function getUser(req, res) {
       res.status(403).send({
         msg: "Forbiden -- Access to this resource on the server is denied!",
       });
-    } else if (user_token.isAdmin && user._id === user_token.id) {
-      //remove password for security reasons
-      user.password = null;
-      res.status(200).send({
-        user: user,
-      });
-    } else if (user._id === user_token.id) {
+    } else {
       //remove password for security reasons
       user.password = null;
       res.status(200).send({
@@ -184,7 +178,7 @@ async function putUser(req, res) {
           userData.month = params.month;
           userData.date = params.date;
           //verify that password is not left uncompleted
-          if (params.pasword) {
+          if (params.password) {
             userData.password = await bcryptjs.hash(params.password, salt);
           }
         }
