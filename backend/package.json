@@ -7,8 +7,8 @@
     "node": "16.x"
   },
   "scripts": {
-    "server": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
+    
   },
   "repository": {
     "type": "git",
