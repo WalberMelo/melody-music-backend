@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./backend/db");
-const userRouter = require("./backend/routes/userRoutes");
-const adminRouter = require("./backend/routes/adminRoutes");
+const connectDB = require("./db");
+const userRouter = require("./routes/userRoutes");
+const adminRouter = require("./routes/adminRoutes");
 const port = 9001;
 const app = express();
 
@@ -19,7 +19,9 @@ app.use(cors());
 app.use( userRouter);
 app.use( adminRouter);
 app.get ("/", (req, res) => {
-  res.send("HOLA HOMEPAGE ");})
+  res.send("HOLA HOMEPAGE");
+});
+
 app.listen(port),
   console.log(`Server is running Port http://localhost:${port}`);
 
