@@ -18,7 +18,8 @@ app.use(cors());
 //End-Points
 app.use( userRouter);
 app.use( adminRouter);
-
+app.get ("/", (req, res) => {
+  res.send("HOLA HOMEPAGE ");})
 app.listen(port),
   console.log(`Server is running Port http://localhost:${port}`);
 
