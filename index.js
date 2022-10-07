@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./db");
-const userRouter = require("./routes/userRoutes");
-const adminRouter = require("./routes/adminRoutes");
+const connectDB = require("./backend/db");
+const userRouter = require("./backend/routes/userRoutes");
+const adminRouter = require("./backend/routes/adminRoutes");
 const port = 9001;
 const app = express();
 
