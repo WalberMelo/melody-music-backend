@@ -2,13 +2,10 @@
   "name": "melody-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
-  "engines": {
-    "node": "16.x"
-  },
+  "main": "api.js",
   "scripts": {
-    "start": "node server.js"
-    
+    "start": "./node_modules/.bin/netlify-lambda serve src",
+    "build": "./node_modules/.bin/netlify-lambda build src"
   },
   "repository": {
     "type": "git",
@@ -32,6 +29,8 @@
     "moment": "^2.29.4",
     "mongoose": "^6.6.3",
     "nanoid": "^4.0.0",
-    "nodemon": "^2.0.20"
+    "netlify-lambda": "^2.0.15",
+    "nodemon": "^2.0.20",
+    "serverless-http": "^3.0.2"
   }
 }

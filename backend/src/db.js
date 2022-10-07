@@ -3,12 +3,18 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
+// const dbusername = "berners-lee";
+// const dbpassword = "eBhZoJ8ScylFpoFx";
+// console.log(dbusername, dbpassword);
+// const dbcluster = "melody";
+// const dbname = "melody_stream";
+
 //Atlas MongoDB setup
 const dbusername = process.env.DB_USERNAME;
 const dbpassword = process.env.DB_SECRET_KEY;
-console.log(dbusername, dbpassword);
 const dbcluster = process.env.DB_CLUSTER;
 const dbname = process.env.DB_NAME;
+
 const dbUri = `mongodb+srv://${dbusername}:${dbpassword}@${dbcluster}.7gqlfp3.mongodb.net/${dbname}?retryWrites=true&w=majority`;
 
 const connectDB = async () => {
