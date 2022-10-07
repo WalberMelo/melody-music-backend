@@ -18,7 +18,7 @@ app.use(cors());
 //End-Points
 app.use( userRouter);
 app.use( adminRouter);
-app.get ("/", (req, res) => {
+app.get ("/backend", (req, res) => {
   res.send("HOLA HOMEPAGE");
 });
 
