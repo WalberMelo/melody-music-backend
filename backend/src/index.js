@@ -1,5 +1,4 @@
 const express = require("express");
-const serverless = require("serverless-http");
 const cors = require("cors");
 const connectDB = require("./db");
 const userRouter = require("../routes/userRoutes");
@@ -17,14 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 //End-Points
-app.use("/.netlify/functions/api", userRouter);
-app.use("/.netlify/functions/api", adminRouter);
+app.use( userRouter);
+app.use( adminRouter);
 
 app.listen(port),
   console.log(`Server is running Port http://localhost:${port}`);
 
-const handler = serverless(app);
-module.exports.handler = async (event, context) => {
-  const result = await handler(event, context);
-  return result;
-};
+
