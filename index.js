@@ -3,7 +3,7 @@ const cors = require("cors");
 const connectDB = require("./db");
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
-const port = 9001;
+const port = 3000;
 const app = express();
 
 //Connect to Data Base
