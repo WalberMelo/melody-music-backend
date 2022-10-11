@@ -14,7 +14,6 @@ function secureRoute(req, res, next) {
   try {
     //decode the token
     const payload = jwt.decodeToken(token);
-
     // Make sure that token is still valid
     // payload.exp --> Time after which the JWT expires
     if (payload.exp <= moment().unix()) {
