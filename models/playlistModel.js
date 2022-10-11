@@ -64,6 +64,6 @@ const validate = (playlist) => {
   return schema.validate(playlist);
 };
 
-const Playlist = mongoose.model("playlist", playlistSchema);
+const Playlist = mongoose.model("playlists", playlistSchema);
 
 module.exports = { Playlist, validate };
