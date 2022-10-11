@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectDB = require("./db");
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
+const playlistRouter = require("./routes/playlistRoutes");
 const port = 3000;
 const app = express();
 
@@ -16,11 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 //End-Points
-app.use( userRouter);
-app.use( adminRouter);
-
+app.use(userRouter);
+app.use(adminRouter);
+app.use(playlistRouter);
 
 app.listen(port),
   console.log(`Server is running Port http://localhost:${port}`);
-
-

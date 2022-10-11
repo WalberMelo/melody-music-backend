@@ -13,6 +13,8 @@ const UserSchema = new Schema(
     month: { type: String, required: true },
     date: { type: String, required: true },
     year: { type: String, required: true },
+    likedSongs: { type: [String], default: [] },
+    playlists: { type: [String], default: [] },
     isAdmin: { type: Boolean, default: false },
   },
   {
@@ -22,13 +24,13 @@ const UserSchema = new Schema(
 
 const validate = (user) => {
   const schema = Joi.object({
-    name: Joi.string().min(2).max(10).required(),
-    lastName: Joi.string().min(5).max(10).required(),
-    email: Joi.string().email().required(),
-    password: passwordComplexity().required(),
+    name: Joi.string().min(2).max(10).trim().required(),
+    lastName: Joi.string().min(5).max(10).trim().required(),
+    email: Joi.string().lowercase().trim().email(),
+    password: passwordComplexity().trim().required(),
     month: Joi.string().required(),
-    date: Joi.string().required(),
-    year: Joi.string().required(),
+    date: Joi.string().trim().required(),
+    year: Joi.string().trim().required(),
     gender: Joi.string().valid("male", "female", "non-binary").required(),
   });
   return schema.validate(user);
