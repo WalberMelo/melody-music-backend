@@ -89,6 +89,10 @@ async function login(req, res) {
 }
 
 async function getUser(req, res) {
+  //TOKEN: jdhfdjfghfajdghf84484989
+  //id
+  //email
+  //isAdmin
   const user_token = await authMiddleware.getUser(req, res);
   console.log(user_token);
 
@@ -117,15 +121,13 @@ async function getUser(req, res) {
 }
 
 async function putUser(req, res) {
-  ///console.log(req.params.id)
-  //recover id and params
-  const userId = req.params.id;
+  //const userId = req.params.id;
   const params = req.body;
   const user_token = await authMiddleware.getUser(req, res);
 
   try {
     //get the user
-    User.findById(userId, async (err, userData) => {
+    User.findById(user_token.id, async (err, userData) => {
       if (err) {
         res.status(500).send({
           msg: "Server status error",
@@ -156,7 +158,7 @@ async function putUser(req, res) {
           }
         }
       }
-      User.findByIdAndUpdate(userId, userData, (err, result) => {
+      User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
         if (err) {
           res.status(500).send({
             msg: "Server status error",
@@ -179,15 +181,16 @@ async function putUser(req, res) {
 
 async function deleteUser(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
-  const userId = req.params.id;
+  console.log(user_token);
+
   try {
-    User.findById(userId, (err, userData) => {
+    User.findById(user_token.id, (err, userData) => {
       if (err) {
         res.status(500).send({ msg: "Server status error" });
       } else if (user_token.id !== userData.id.valueOf()) {
         res.status(403).send({ msg: "Error: unauthorized request" });
       }
-      User.findByIdAndDelete(userId, (err, result) => {
+      User.findByIdAndDelete(user_token.id, (err, result) => {
         if (err) {
           res.status(500).send({ msg: "Server status error" });
         } else if (!result) {

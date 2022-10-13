@@ -6,13 +6,9 @@ const userRouter = express.Router();
 userRouter.post("/register", userController.postUser);
 userRouter.post("/login", userController.login);
 userRouter.get("/user", [authMiddleware.secureRoute], userController.getUser);
-userRouter.put(
-  "/user/:id",
-  [authMiddleware.secureRoute],
-  userController.putUser
-);
+userRouter.put("/user", [authMiddleware.secureRoute], userController.putUser);
 userRouter.delete(
-  "/user/:id",
+  "/user",
   [authMiddleware.secureRoute],
   userController.deleteUser
 );
