@@ -10,9 +10,7 @@ const UserSchema = new Schema(
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     gender: { type: String, required: true },
-    month: { type: String, required: true },
-    date: { type: String, required: true },
-    year: { type: String, required: true },
+    birthday: Joi.string().required(),
     likedSongs: { type: [String], default: [] },
     playlists: { type: [String], default: [] },
     isAdmin: { type: Boolean, default: false },
@@ -28,9 +26,7 @@ const validate = (user) => {
     lastName: Joi.string().min(5).max(10).trim().required(),
     email: Joi.string().lowercase().trim().email(),
     password: passwordComplexity().trim().required(),
-    month: Joi.string().required(),
-    date: Joi.string().trim().required(),
-    year: Joi.string().trim().required(),
+    birthday: Joi.string().required(),
     gender: Joi.string().valid("male", "female", "non-binary").required(),
   });
   return schema.validate(user);
