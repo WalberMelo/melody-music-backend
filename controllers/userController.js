@@ -156,9 +156,7 @@ async function putUser(req, res) {
           userData.lastName = params.lastName;
           userData.email = params.email;
           userData.gender = params.gender;
-          userData.year = params.year;
-          userData.month = params.month;
-          userData.date = params.date;
+          userData.birthday = params.birthday;
           //verify that password is not left uncompleted
           if (params.newPassword && checkOldPassword) {
             userData.password = await bcryptjs.hash(params.newPassword, salt);
