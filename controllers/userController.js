@@ -123,6 +123,7 @@ async function getUser(req, res) {
 async function putUser(req, res) {
   //const userId = req.params.id;
   const params = req.body;
+  console.log(req.body);
   const user_token = await authMiddleware.getUser(req, res);
 
   try {
@@ -133,7 +134,7 @@ async function putUser(req, res) {
           msg: "Server status error",
         });
       } else {
-        //if ther is no data or it is not foun trhw error
+        //if there is no data or it is not found throw error
         if (!userData) {
           res.status(404).send({
             msg: "Error: User not found",
@@ -153,8 +154,13 @@ async function putUser(req, res) {
           userData.month = params.month;
           userData.date = params.date;
           //verify that password is not left uncompleted
-          if (params.password) {
-            userData.password = await bcryptjs.hash(params.password, salt);
+          if (params.newPassword) {
+            console.log(
+              await bcryptjs.compare(params.newPassword, userData.password)
+            );
+            if (await bcryptjs.compare(params.newPassword, userData.password)) {
+              userData.password = await bcryptjs.hash(params.newPassword, salt);
+            }
           }
         }
       }
