@@ -144,6 +144,12 @@ async function putUser(req, res) {
             msg: "Error: unauthorized request",
           });
         } else {
+          const checkOldPassword = await bcryptjs.compare(
+            params.oldPassword,
+            userData.password
+          );
+          console.log(checkOldPassword);
+
           const salt = bcryptjs.genSaltSync(10);
           // replace old info with the new info received
           userData.name = params.name;
@@ -154,13 +160,8 @@ async function putUser(req, res) {
           userData.month = params.month;
           userData.date = params.date;
           //verify that password is not left uncompleted
-          if (params.newPassword) {
-            console.log(
-              await bcryptjs.compare(params.newPassword, userData.password)
-            );
-            if (await bcryptjs.compare(params.newPassword, userData.password)) {
-              userData.password = await bcryptjs.hash(params.newPassword, salt);
-            }
+          if (params.newPassword && checkOldPassword) {
+            userData.password = await bcryptjs.hash(params.newPassword, salt);
           }
         }
       }
