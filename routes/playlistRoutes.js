@@ -9,4 +9,14 @@ playlistRouter.post(
   playlistController.createPlaylist
 );
 
+playlistRouter.put("/playlist/:id", [authMiddleware.secureRoute], playlistController.editPlaylist)
+
+playlistRouter.get("/playlist/:id", [authMiddleware.secureRoute], playlistController.getPlaylistById)
+
+playlistRouter.get("/userplaylists", [authMiddleware.secureRoute], playlistController.getAllUserPlaylists)
+
+playlistRouter.get("/allplaylists", [authMiddleware.secureRoute], playlistController.getAllPlaylists)
+
+playlistRouter.delete("/:id", [authMiddleware.secureRoute], playlistController.deletePlaylistById)
+
 module.exports = playlistRouter;
