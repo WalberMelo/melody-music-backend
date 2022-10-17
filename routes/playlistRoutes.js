@@ -9,7 +9,7 @@ playlistRouter.post(
   playlistController.createPlaylist
 );
 
-playlistRouter.put("/playlist/:id", [authMiddleware.secureRoute], playlistController.editPlaylist)
+playlistRouter.put("/playlist/:id", [authMiddleware.secureRoute], playlistController.getPlaylist)
 
 playlistRouter.get("/playlist/:id", [authMiddleware.secureRoute], playlistController.getPlaylistById)
 

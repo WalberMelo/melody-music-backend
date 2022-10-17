@@ -1,6 +1,7 @@
 const { Playlist, validate } = require("../models/playlistModel");
 const { User } = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
+const {Song} = require("../models/userModel")
 
 
 async function createPlaylist(req, res) {
@@ -43,7 +44,7 @@ async function createPlaylist(req, res) {
 
 //edit playlist by id (edit basic parameters not to add mor songs on playlist)
 
-async function editPlaylist(req, res, next) {
+async function getPlaylist(req, res, next) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id)
   console.log(playlist);
@@ -62,7 +63,7 @@ async function editPlaylist(req, res, next) {
       playlist.name = req.body.name
       playlist.description = req.body.description
       //playlist.thumbnail = req.body.thumbnail
-      console.log("entro en try");
+    
       await playlist.save()
       res.status(201).send({ msg: "Playlist updated successfully"})
     }
@@ -74,25 +75,58 @@ async function editPlaylist(req, res, next) {
 // Add song to playlist
 //? Need to create song modal before finishing fuction
 
-// async function addSongToPlaylist(req, res, next) {
-//   const user_token = await authMiddleware.getUser(req, res);
-//   const playlist = await Playlist.findById(req.params.id)
-//   try {
-//     if (!playlist){
-//       res.status(404).send({
-//         msg:"Error: Playlist doesn't exist"
-//       })
-//     }else if (user_token.id !== playlist.userId){
-//       res.status(403).send({ 
-//         msg: "Forbiden -- Access to this resource on the server is denied!"
-//       })
-//     }else{
+async function addSongToPlaylist(req, res, next) {
+  const user_token = await authMiddleware.getUser(req, res);
+  const playlist = await Playlist.findById(req.params.id);
+ // const song = await Song.findById(req.params.id)
+  
+  try {
+    if (!playlist){
+      res.status(404).send({
+        msg:"Error: Playlist doesn't exist"
+      })
+    }else if (user_token.id !== playlist.userId){
+      res.status(403).send({ 
+        msg: "Forbiden -- Access to this resource on the server is denied!"
+      })
+    }else if(playlist.tracks.indexOf(req.body.trackId) === -1) {
+      playlist.tracks.push(req.body.trackId);
+    }
+    await playlist.save();
+    res.status(200).send({ data: playlist, message: "Added to playlist" });
 
-//     }
-//   } catch (error) {
     
-//   }
-// }
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
+
+
+//remove song from playlist
+
+async function removeSongFromPlaylist(req, res){
+  const user_token = await authMiddleware.getUser(req, res);
+  const playlist = await Playlist.findById(req.params.id);
+  
+  try {
+    if (!playlist){
+      res.status(404).send({
+        msg:"Error: Playlist doesn't exist"
+      })
+    }else if (user_token.id !== playlist.userId){
+      res.status(403).send({ 
+        msg: "Forbiden -- Access to this resource on the server is denied!"
+      })
+    }else{
+      const index = playlist.songs.indexOf(req.body.songId);
+	playlist.songs.splice(index, 1);
+	await playlist.save();
+	res.status(200).send({ data: playlist, message: "Removed from playlist" });
+    }
+}catch (error) {
+  res.status(500).send(error)
+}
+}
 
 
 // get playlist by id
@@ -138,6 +172,7 @@ async function getAllUserPlaylists(req, res) {
     res.status(500).send(error)
   }
 }
+
 
 //Get all playlists crated only for admin
 async function getAllPlaylists(req, res) {
@@ -194,9 +229,9 @@ async function deletePlaylistById(req, res){
 
 module.exports = {
   createPlaylist,
-  editPlaylist,
-  getPlaylistById,
-  getAllUserPlaylists,
+  getPlaylist,  
   getAllPlaylists,
-  deletePlaylistById
+  getAllUserPlaylists,
+  deletePlaylistById,
+  getPlaylistById
 };
