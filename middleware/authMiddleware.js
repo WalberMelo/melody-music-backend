@@ -31,11 +31,22 @@ function secureRoute(req, res, next) {
 function getUser(req, res) {
   //recover token
   const token = req.headers.auth_token.replace(/['"]+/g, "");
-
   // decode token
   const payload = jwt.decodeToken(token);
-
   return payload;
 }
 
-module.exports = { secureRoute, getUser };
+function recoveryPasswordToken(req, res) {
+  //recover token
+  const token = req.params.token;
+
+  try {
+    // decode token
+    const payload = jwt.decodeToken(token);
+    return payload;
+  } catch (error) {
+    return res.status(400).send({ msg: "Error: token has expired" });
+  }
+}
+
+module.exports = { secureRoute, getUser, recoveryPasswordToken };

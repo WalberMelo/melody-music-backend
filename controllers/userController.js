@@ -2,6 +2,9 @@ const jwt = require("../services/jwtServices");
 const bcryptjs = require("bcryptjs");
 const { User, validate } = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
+var nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+dotenv.config();
 
 async function postUser(req, res) {
   const params = validate(req.body);
@@ -89,10 +92,6 @@ async function login(req, res) {
 }
 
 async function getUser(req, res) {
-  //TOKEN: jdhfdjfghfajdghf84484989
-  //id
-  //email
-  //isAdmin
   const user_token = await authMiddleware.getUser(req, res);
   console.log(user_token);
 
@@ -106,7 +105,7 @@ async function getUser(req, res) {
       });
     } else if (user._id != user_token.id) {
       res.status(403).send({
-        msg: "Forbiden -- Access to this resource on the server is denied!",
+        msg: "Forbidden -- Access to this resource on the server is denied!",
       });
     } else {
       //remove password for security reasons
@@ -201,12 +200,89 @@ async function deleteUser(req, res) {
         } else if (!result) {
           res.status(404).send({ msg: "Error: User doesn't exist" });
         }
-        res.status(200).send({ masg: "User deleted succesfully" });
+        res.status(200).send({ msg: "User deleted successfully" });
       });
     });
   } catch (error) {
     res.status(500).send({ msg: "Server status error" });
   }
+}
+
+async function sendEmail(req, res) {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(400).send({
+        msg: "User with this email doesn't exists",
+      });
+    } else {
+      const token = jwt.createToken(user, "15m");
+
+      let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.GOOGLE_APP_EMAIL,
+          pass: process.env.GOOGLE_APP_PW,
+        },
+      });
+
+      const url = "http://localhost:3000";
+      const data = {
+        from: "noreply@melody.com",
+        to: email,
+        subject: "Reset Account Password Link",
+        html: `
+        <h3>You requested to reset your password.</h3>
+        <h3>Please click the link bellow to reset your password</h3>
+    <p>${url}/resetpassword/${token}</p>`,
+      };
+
+      await User.updateOne({ resetLink: token }, (err) => {
+        if (err) {
+          return res.status(400).send({ error: "reset password link error" });
+        } else {
+          transporter.sendMail(data, function (error) {
+            if (error) {
+              return res.status(400).send({ error: error.message });
+            }
+            return res.status(200).send({
+              message: "Email has been sent, please follow the instructions",
+            });
+          });
+        }
+      }).clone();
+    }
+  } catch (error) {
+    return res.status(400).send({ error: error.message });
+  }
+}
+
+async function resetPassword(req, res) {
+  const user_token = await authMiddleware.recoveryPasswordToken(req, res);
+  console.log("", user_token);
+  //! TOKEN RECEIVED FROM SENT EMAIL SHOULD BE SENT TO FRONTEND
+}
+// {
+//   id: '6349b7aeb4fb427d3c02cdc9',
+//   email: 'caravanresidence@gmail.com',
+//   isAdmin: false,
+//   iat: 1666041212,
+//   exp: 1666042112
+// }
+
+async function changePassword(req, res) {
+  const user = await User.findById(req.params.userId);
+  if (!user) return res.status(400).send("invalid link or expired");
+
+  const token = await User.findOne({
+    token: req.params.token,
+  });
+  if (!token) return res.status(400).send("Invalid link or expired");
 }
 
 module.exports = {
@@ -215,4 +291,7 @@ module.exports = {
   getUser,
   putUser,
   deleteUser,
+  sendEmail,
+  changePassword,
+  resetPassword,
 };
