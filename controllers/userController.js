@@ -120,7 +120,6 @@ async function getUser(req, res) {
 }
 
 async function putUser(req, res) {
-  //! MISS VALIDATE JOIN
   const params = req.body;
   const user_token = await authMiddleware.getUser(req, res);
 
@@ -209,7 +208,6 @@ async function deleteUser(req, res) {
 
 async function sendEmail(req, res) {
   const { email } = req.body;
-  console.log(email);
 
   try {
     const user = await User.findOne({ email });
@@ -220,7 +218,6 @@ async function sendEmail(req, res) {
       });
     } else {
       const token = jwt.createToken(user, "30m");
-
       let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -271,11 +268,8 @@ async function resetPassword(req, res) {
 }
 
 async function changePassword(req, res) {
-  //! MISS VALIDATE JOIN
-  const params = req.body;
-  console.log("NEW PASSWORD: ", params);
-  const user_token = await authMiddleware.getUser(req, res);
-  console.log("SERVER TOKEN RECEIVED: ", user_token);
+  const params = validate(req.body);
+  console.log(params);
 
   try {
     User.findById(user_token.id, async (err, userData) => {
