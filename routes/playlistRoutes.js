@@ -19,4 +19,9 @@ playlistRouter.get("/allplaylists", [authMiddleware.secureRoute], playlistContro
 
 playlistRouter.delete("/:id", [authMiddleware.secureRoute], playlistController.deletePlaylistById)
 
+playlistRouter.put("/add-song/:id", [authMiddleware.secureRoute], playlistController.addSongToPlaylist)
+
+playlistRouter.put("/remove-song/:id", [authMiddleware.secureRoute], playlistController.removeSongFromPlaylist)
+
+
 module.exports = playlistRouter;

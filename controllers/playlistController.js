@@ -1,7 +1,7 @@
 const { Playlist, validate } = require("../models/playlistModel");
 const { User } = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
-const {Song} = require("../models/userModel")
+const {Song} = require("../models/songModel")
 
 
 async function createPlaylist(req, res) {
@@ -75,10 +75,12 @@ async function getPlaylist(req, res, next) {
 // Add song to playlist
 //? Need to create song modal before finishing fuction
 
-async function addSongToPlaylist(req, res, next) {
+async function addSongToPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
- // const song = await Song.findById(req.params.id)
+
+  const song = await Song.findById(req.body)  
+  const tracks = playlist.tracks.map(track => track._id.toString())
   
   try {
     if (!playlist){
@@ -89,13 +91,20 @@ async function addSongToPlaylist(req, res, next) {
       res.status(403).send({ 
         msg: "Forbiden -- Access to this resource on the server is denied!"
       })
-    }else if(playlist.tracks.indexOf(req.body.trackId) === -1) {
-      playlist.tracks.push(req.body.trackId);
-    }
-    await playlist.save();
-    res.status(200).send({ data: playlist, message: "Added to playlist" });
+     }else if (!song || song === null){
+      res.status(404).send({msg:"Error: Song doesn't exist'"})
+     }
+      else if ((tracks.indexOf(req.body._id) !== -1)){
+       res.status(501).send({ msg: "Error: Song already in playlist"})
+     }
+    else if(tracks.indexOf(req.body._id) === -1) {
 
-    
+      
+      playlist.tracks.push(req.body._id);
+
+      await playlist.save();
+      res.status(200).send({ data: playlist, message: "Added to playlist" });
+    }
   } catch (error) {
     res.status(500).send(error)
   }
@@ -107,6 +116,7 @@ async function addSongToPlaylist(req, res, next) {
 async function removeSongFromPlaylist(req, res){
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
+  const song = await Song.findById(req.body)
   
   try {
     if (!playlist){
@@ -117,9 +127,13 @@ async function removeSongFromPlaylist(req, res){
       res.status(403).send({ 
         msg: "Forbiden -- Access to this resource on the server is denied!"
       })
-    }else{
-      const index = playlist.songs.indexOf(req.body.songId);
-	playlist.songs.splice(index, 1);
+    }else if (!song || song === null){
+      res.status(404).send({msg:"Error: Song doesn't exist'"})
+     }
+    
+    else{
+      const index = playlist.tracks.indexOf(req.body.trackId);
+	playlist.tracks.splice(index, 1);
 	await playlist.save();
 	res.status(200).send({ data: playlist, message: "Removed from playlist" });
     }
@@ -233,5 +247,7 @@ module.exports = {
   getAllPlaylists,
   getAllUserPlaylists,
   deletePlaylistById,
-  getPlaylistById
+  getPlaylistById, 
+  addSongToPlaylist,
+  removeSongFromPlaylist
 };

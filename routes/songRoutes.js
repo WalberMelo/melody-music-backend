@@ -12,4 +12,8 @@ songRouter.put("/:id", [authMiddleware.secureRoute], songController.updateSong)
 
 songRouter.put("/like/:id", [authMiddleware.secureRoute], songController.likeSong)
 
+songRouter.get("/like", [authMiddleware.secureRoute], songController.getLikedSongs)
+
+songRouter.delete("/song/:id", [authMiddleware.secureRoute], songController.deleteSong)
+
 module.exports = songRouter

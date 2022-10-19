@@ -46,7 +46,7 @@ const playlistSchema = new mongoose.Schema(
     tracks: [
       {
         trackId: { type: String, ref: "tracks" },
-        order: { type: Number, default: 0 },
+        
       },
     ],
     followedBy: [{ type: String }],

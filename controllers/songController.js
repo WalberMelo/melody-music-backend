@@ -75,16 +75,18 @@ async function updateSong(req, res, next) {
 
 // Liked song
 
-async function likeSong(req, res, next) {
+async function likeSong(req, res) {
     
     const song = await Song.findById(req.params.id);
+    const user_token = await authMiddleware.getUser(req, res)
+    const user = await User.findById(user_token.id)   
+    const index_user = user.likedSongs.indexOf(song._id)
+    const index_song = song.likedBy.indexOf(user._id)
+        
     try {
         if(!song){
             res.status(404).send({ msg: "Song not found"})
-        }else{
-            const user = await User.findById(req.user._id)
-            const index_user = user.likedSongs.indexOf(song._id)
-            const index_song = song.likedSongs.indexOf(user._id)
+        }else{          
             if( index_user === -1 && index_song === -1){
                 user.likedSongs.push(song._id)                
                 song.likedBy.push(user._id)
@@ -95,7 +97,48 @@ async function likeSong(req, res, next) {
                 res.status(201).send({msg: "Removed from your liked songs"})
             }
             await user.save()
+            await song.save()
         }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+}
+
+// get liked songs 
+
+async function getLikedSongs(req, res){
+    const user_token = await authMiddleware.getUser(req, res)
+    const user = await User.findById(user_token.id)
+    const songs = await Song.find({ _id: user.likedSongs })
+    try {
+        if (!songs){
+            res.status(404).send({ msg: "Song doesn't exist"})
+        }else{
+            res.status(200).send({songs, msg: "These are all your liked songs"})
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+}
+
+//Delete Songs
+
+async function deleteSong(req, res){
+    const song = await Song.findById(req.params.id)
+    const user_token = await authMiddleware.getUser(req, res);
+    const user = await User.findById({_id: user_token.id})
+    try {
+        if (!song){
+            res.status(404).send({ msg: "Song doesn't exist"})
+        }else if (user_token.id !== song.userId){
+            res.status(403).send({ 
+              msg: "Forbiden -- Access to this resource on the server is denied!"
+            })
+          }else{
+            
+            await song.delete()
+            res.status(200).send({ msg: "Song removed successfully"})
+          }
     } catch (error) {
         res.status(500).send(error)
     }
@@ -106,5 +149,7 @@ module.exports = {
     createSong,
     getAllSongs,
     updateSong,
-    likeSong
+    likeSong,
+    getLikedSongs,
+    deleteSong
 }
