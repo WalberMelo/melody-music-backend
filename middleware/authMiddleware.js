@@ -37,11 +37,9 @@ function getUser(req, res) {
 }
 
 function recoveryPasswordToken(req, res) {
-  //recover token
   const token = req.params.token;
 
   try {
-    // decode token
     const payload = jwt.decodeToken(token);
     return payload;
   } catch (error) {

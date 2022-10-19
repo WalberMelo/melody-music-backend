@@ -15,14 +15,13 @@ userRouter.delete(
 );
 
 //PASSWORD RECOVERY
-//POST email in order to send token
+//1) Send email with token to the user
 userRouter.post("/password-reset", userController.sendEmail);
-//POST in order to change password
-userRouter.post(
-  "/password-reset/:userId/:token",
-  userController.changePassword
-);
-//GET route which will validate the link and show password reset form.
+
+//2) Validate the link and show password reset form.
 userRouter.get("/resetpassword/:token", userController.resetPassword);
+
+//3) POST in order to set a new password
+userRouter.put("/password-reset", userController.changePassword);
 
 module.exports = userRouter;

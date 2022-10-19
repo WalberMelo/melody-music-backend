@@ -120,9 +120,8 @@ async function getUser(req, res) {
 }
 
 async function putUser(req, res) {
-  //const userId = req.params.id;
+  //! MISS VALIDATE JOIN
   const params = req.body;
-  console.log(req.body);
   const user_token = await authMiddleware.getUser(req, res);
 
   try {
@@ -210,6 +209,7 @@ async function deleteUser(req, res) {
 
 async function sendEmail(req, res) {
   const { email } = req.body;
+  console.log(email);
 
   try {
     const user = await User.findOne({ email });
@@ -219,7 +219,7 @@ async function sendEmail(req, res) {
         msg: "User with this email doesn't exists",
       });
     } else {
-      const token = jwt.createToken(user, "15m");
+      const token = jwt.createToken(user, "30m");
 
       let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -264,25 +264,58 @@ async function sendEmail(req, res) {
 
 async function resetPassword(req, res) {
   const user_token = await authMiddleware.recoveryPasswordToken(req, res);
-  console.log("", user_token);
-  //! TOKEN RECEIVED FROM SENT EMAIL SHOULD BE SENT TO FRONTEND
+
+  if (!user_token) {
+    return res.status(400).send("Invalid link or expired");
+  } else return res.status(200).send(req.user_token);
 }
-// {
-//   id: '6349b7aeb4fb427d3c02cdc9',
-//   email: 'caravanresidence@gmail.com',
-//   isAdmin: false,
-//   iat: 1666041212,
-//   exp: 1666042112
-// }
 
 async function changePassword(req, res) {
-  const user = await User.findById(req.params.userId);
-  if (!user) return res.status(400).send("invalid link or expired");
+  //! MISS VALIDATE JOIN
+  const params = req.body;
+  console.log("NEW PASSWORD: ", params);
+  const user_token = await authMiddleware.getUser(req, res);
+  console.log("SERVER TOKEN RECEIVED: ", user_token);
 
-  const token = await User.findOne({
-    token: req.params.token,
-  });
-  if (!token) return res.status(400).send("Invalid link or expired");
+  try {
+    User.findById(user_token.id, async (err, userData) => {
+      if (err) {
+        res.status(500).send({
+          msg: "Server status error",
+        });
+      } else {
+        if (!userData) {
+          res.status(404).send({
+            msg: "Error: User not found",
+          });
+        } else if (user_token.id !== userData._id.valueOf()) {
+          res.status(403).send({
+            msg: "Error: unauthorized request",
+          });
+        } else {
+          const salt = bcryptjs.genSaltSync(10);
+          userData.password = await bcryptjs.hash(params.newPassword, salt);
+        }
+      }
+      User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
+        if (err) {
+          res.status(500).send({
+            msg: "Server status error",
+          });
+        } else if (!result) {
+          res.status(404).send({
+            msg: "Error: user doesn't exists",
+          });
+        } else {
+          res.status(201).send({
+            user: userData,
+          });
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 module.exports = {
