@@ -149,19 +149,19 @@ async function putUser(req, res) {
 
           const salt = bcryptjs.genSaltSync(10);
           // replace old info with the new info received
-          userData.name = params.name;
-          userData.lastName = params.lastName;
-          userData.email = params.email;
-          userData.gender = params.gender;
-          userData.birthday = params.birthday;
-          //verify that password is not left uncompleted
-          if (params.newPassword && checkOldPassword) {
-            userData.password = await bcryptjs.hash(params.newPassword, salt);
-          }
+
+          userData = validate(params);
+
+          userData.value.password = await bcryptjs.hash(params.password, salt);
         }
       }
-      User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
-        if (err) {
+      User.findByIdAndUpdate(user_token.id, userData.value, (err, result) => {
+        //console.log(userData.value);
+        if (userData.error !== undefined) {
+          res.status(403).send({
+            msg: "Error: validation error",
+          });
+        } else if (err) {
           res.status(500).send({
             msg: "Server status error",
           });
@@ -171,7 +171,7 @@ async function putUser(req, res) {
           });
         } else {
           res.status(201).send({
-            user: userData,
+            msg: "User updated successfully",
           });
         }
       });
@@ -188,21 +188,33 @@ async function deleteUser(req, res) {
   try {
     User.findById(user_token.id, (err, userData) => {
       if (err) {
-        res.status(500).send({ msg: "Server status error" });
+        res.status(500).send({
+          msg: "Server status error",
+        });
       } else if (user_token.id !== userData.id.valueOf()) {
-        res.status(403).send({ msg: "Error: unauthorized request" });
+        res.status(403).send({
+          msg: "Error: unauthorized request",
+        });
       }
       User.findByIdAndDelete(user_token.id, (err, result) => {
         if (err) {
-          res.status(500).send({ msg: "Server status error" });
+          res.status(500).send({
+            msg: "Server status error",
+          });
         } else if (!result) {
-          res.status(404).send({ msg: "Error: User doesn't exist" });
+          res.status(404).send({
+            msg: "Error: User doesn't exist",
+          });
         }
-        res.status(200).send({ msg: "User deleted successfully" });
+        res.status(200).send({
+          msg: "User deleted successfully",
+        });
       });
     });
   } catch (error) {
-    res.status(500).send({ msg: "Server status error" });
+    res.status(500).send({
+      msg: "Server status error",
+    });
   }
 }
 
