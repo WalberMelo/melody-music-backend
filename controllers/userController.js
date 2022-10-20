@@ -1,7 +1,11 @@
 const jwt = require("../services/jwtServices");
 const bcryptjs = require("bcryptjs");
-const { User, validate } = require("../models/userModel");
+const {
+  User,
+  validate
+} = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
+const Joi = require("joi");
 
 async function postUser(req, res) {
   const params = validate(req.body);
@@ -46,10 +50,12 @@ async function postUser(req, res) {
 }
 
 async function login(req, res) {
-  const { email, password } = req.body;
+  const {
+    email,
+    password
+  } = req.body;
   try {
-    User.findOne(
-      {
+    User.findOne({
         email: email,
       },
       async (err, userData) => {
@@ -123,7 +129,7 @@ async function getUser(req, res) {
 async function putUser(req, res) {
   //const userId = req.params.id;
   const params = req.body;
-  console.log(req.body);
+
   const user_token = await authMiddleware.getUser(req, res);
 
   try {
@@ -146,26 +152,23 @@ async function putUser(req, res) {
         } else {
           const salt = bcryptjs.genSaltSync(10);
           // replace old info with the new info received
-          userData.name = params.name;
-          userData.lastName = params.lastName;
-          userData.email = params.email;
-          userData.gender = params.gender;
-          userData.year = params.year;
-          userData.month = params.month;
-          userData.date = params.date;
-          //verify that password is not left uncompleted
-          if (params.newPassword) {
-            console.log(
-              await bcryptjs.compare(params.newPassword, userData.password)
-            );
-            if (await bcryptjs.compare(params.newPassword, userData.password)) {
-              userData.password = await bcryptjs.hash(params.newPassword, salt);
-            }
-          }
+        
+          userData = validate(params)
+          
+
+          userData.value.password = await bcryptjs.hash(params.password, salt);
+       
         }
+        
       }
-      User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
-        if (err) {
+      User.findByIdAndUpdate(user_token.id, userData.value, (err, result) => {
+        //console.log(userData.value);
+        if (userData.error !== undefined) {
+          res.status(403).send({
+            msg: "Error: validation error"
+          })
+
+        }else if (err) {
           res.status(500).send({
             msg: "Server status error",
           });
@@ -174,8 +177,9 @@ async function putUser(req, res) {
             msg: "Error: user doesn't exists",
           });
         } else {
+           
           res.status(201).send({
-            user: userData,
+            msg: "User updated successfully"
           });
         }
       });
@@ -192,21 +196,33 @@ async function deleteUser(req, res) {
   try {
     User.findById(user_token.id, (err, userData) => {
       if (err) {
-        res.status(500).send({ msg: "Server status error" });
+        res.status(500).send({
+          msg: "Server status error"
+        });
       } else if (user_token.id !== userData.id.valueOf()) {
-        res.status(403).send({ msg: "Error: unauthorized request" });
+        res.status(403).send({
+          msg: "Error: unauthorized request"
+        });
       }
       User.findByIdAndDelete(user_token.id, (err, result) => {
         if (err) {
-          res.status(500).send({ msg: "Server status error" });
+          res.status(500).send({
+            msg: "Server status error"
+          });
         } else if (!result) {
-          res.status(404).send({ msg: "Error: User doesn't exist" });
+          res.status(404).send({
+            msg: "Error: User doesn't exist"
+          });
         }
-        res.status(200).send({ masg: "User deleted succesfully" });
+        res.status(200).send({
+          masg: "User deleted succesfully"
+        });
       });
     });
   } catch (error) {
-    res.status(500).send({ msg: "Server status error" });
+    res.status(500).send({
+      msg: "Server status error"
+    });
   }
 }
 
