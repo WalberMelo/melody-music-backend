@@ -240,7 +240,7 @@ async function sendEmail(req, res) {
         },
       });
 
-      const url = "http://localhost:3000";
+      const url = "https://melody-music-stream-ten.vercel.app";
       const data = {
         from: "noreply@melody.com",
         to: email,
