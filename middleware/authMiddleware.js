@@ -29,11 +29,13 @@ function secureRoute(req, res, next) {
 
 // create function to recover users
 function getUser(req, res) {
-  //recover token
   const token = req.headers.auth_token.replace(/['"]+/g, "");
-  // decode token
-  const payload = jwt.decodeToken(token);
-  return payload;
+  try {
+    const payload = jwt.decodeToken(token);
+    return payload;
+  } catch (error) {
+    return res.status(400).send({ msg: "Error: token has expired" });
+  }
 }
 
 function recoveryPasswordToken(req, res) {

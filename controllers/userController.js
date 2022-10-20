@@ -1,6 +1,6 @@
 const jwt = require("../services/jwtServices");
 const bcryptjs = require("bcryptjs");
-const { User, validate } = require("../models/userModel");
+const { User, validate, validatePassword } = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
 var nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
@@ -261,52 +261,60 @@ async function sendEmail(req, res) {
 
 async function resetPassword(req, res) {
   const user_token = await authMiddleware.recoveryPasswordToken(req, res);
-
+  console.log(user_token);
+  //!Check invalid token
   if (!user_token) {
     return res.status(400).send("Invalid link or expired");
   } else return res.status(200).send(req.user_token);
 }
 
 async function changePassword(req, res) {
-  const params = validate(req.body);
-  console.log(params);
+  const user_token = await authMiddleware.getUser(req, res);
+  const params = validatePassword(req.body);
 
   try {
-    User.findById(user_token.id, async (err, userData) => {
-      if (err) {
-        res.status(500).send({
-          msg: "Server status error",
-        });
-      } else {
-        if (!userData) {
-          res.status(404).send({
-            msg: "Error: User not found",
-          });
-        } else if (user_token.id !== userData._id.valueOf()) {
-          res.status(403).send({
-            msg: "Error: unauthorized request",
-          });
-        } else {
-          const salt = bcryptjs.genSaltSync(10);
-          userData.password = await bcryptjs.hash(params.newPassword, salt);
-        }
-      }
-      User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
+    if (params.error) {
+      res.status(400).send({ msg: `${params.error}` });
+    } else {
+      User.findById(user_token.id, async (err, userData) => {
         if (err) {
           res.status(500).send({
             msg: "Server status error",
           });
-        } else if (!result) {
-          res.status(404).send({
-            msg: "Error: user doesn't exists",
-          });
         } else {
-          res.status(201).send({
-            user: userData,
-          });
+          if (!userData) {
+            res.status(404).send({
+              msg: "Error: User not found",
+            });
+          } else if (user_token.id !== userData._id.valueOf()) {
+            res.status(403).send({
+              msg: "Error: unauthorized request",
+            });
+          } else {
+            const salt = bcryptjs.genSaltSync(10);
+            userData.password = await bcryptjs.hash(
+              params.value.password,
+              salt
+            );
+          }
         }
+        User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
+          if (err) {
+            res.status(500).send({
+              msg: "Server status error",
+            });
+          } else if (!result) {
+            res.status(404).send({
+              msg: "Error: user doesn't exists",
+            });
+          } else {
+            res.status(201).send({
+              user: userData,
+            });
+          }
+        });
       });
-    });
+    }
   } catch (error) {
     console.error(error);
   }
