@@ -4,6 +4,7 @@ const songController = require("../controllers/songController")
 const songRouter = express.Router();
 
 
+
 songRouter.post("/song", [authMiddleware.secureRoute], songController.createSong)
 
 songRouter.get("/songs", [authMiddleware.secureRoute], songController.getAllSongs)

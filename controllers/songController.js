@@ -3,14 +3,12 @@ const {Song, validate} = require("../models/songModel")
 const authMiddleware = require("../middleware/authMiddleware")
 
 
+
 // Create Song 
 
 async function createSong(req,res) {
     const params = validate(req.body)
-    console.log('params: ', params);
     const user_token = await authMiddleware.getUser(req, res);
-    console.log(user_token);
-    
 
     try {
         if (params.error) throw{
@@ -63,7 +61,6 @@ async function updateSong(req, res, next) {
             song.name = req.body.name
             song.artists = req.body.artists
             song.genere = req.body.genere
-           // song.thumbnail = req.body.thumbnail
            await song.save()
            res.status(201).send({ msg: "Song updated successfully"})
 
@@ -151,5 +148,6 @@ module.exports = {
     updateSong,
     likeSong,
     getLikedSongs,
-    deleteSong
+    deleteSong,
+    
 }

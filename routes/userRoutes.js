@@ -3,7 +3,6 @@ const userController = require("../controllers/userController");
 const authMiddleware = require("../middleware/authMiddleware");
 const userRouter = express.Router();
 
-//CRUD USER OPERATIONS
 userRouter.post("/register", userController.postUser);
 userRouter.post("/login", userController.login);
 userRouter.get("/user", [authMiddleware.secureRoute], userController.getUser);

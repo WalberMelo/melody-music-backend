@@ -5,7 +5,7 @@ const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const playlistRouter = require("./routes/playlistRoutes");
 const songRouter = require("./routes/songRoutes")
-const authMiddleware = require("./middleware/authMiddleware")
+const cloudinaryRouter = require("./routes/cloudinaryRoutes")
 const port = 3000;
 const app = express();
 
@@ -23,6 +23,7 @@ app.use(userRouter);
 app.use(adminRouter);
 app.use(playlistRouter);
 app.use(songRouter)
+app.use(cloudinaryRouter)
 
 app.listen(port),
   console.log(`Server is running Port http://localhost:${port}`);
