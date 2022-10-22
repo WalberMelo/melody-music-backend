@@ -19,9 +19,6 @@ const songSchema = new mongoose.Schema({
     popularity: {
         type: String
     },
-    thumbnail: {
-        type: String
-    },
     duration: {
         type: Number
     },
@@ -48,7 +45,9 @@ const validate = (song) => {
     const schema = Joi.object({
       name: Joi.string().min(2).max(50).required(),
       artist: Joi.string().min(2).max(30).required(),
-      genere: Joi.string().min(2).max(30).required()
+      genere: Joi.string().min(2).max(30).required(),
+      url: Joi.string().required(),
+      duration: Joi.number().required()
     });
     return schema.validate(song);
   };
