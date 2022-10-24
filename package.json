@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WalberMelo/melody-backend.git"
+    "url": "git+https://github.com/WalberMelo/melody-music-stream.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/WalberMelo/melody-backend/issues"
+    "url": "https://github.com/WalberMelo/melody-music-stream/issues"
   },
-  "homepage": "https://github.com/WalberMelo/melody-backend#readme",
+  "homepage": "https://github.com/WalberMelo/melody-music-stream#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.32.0",
