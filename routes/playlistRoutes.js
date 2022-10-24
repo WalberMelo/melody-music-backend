@@ -1,27 +1,54 @@
-const express = require("express");
 const playlistController = require("../controllers/playlistController");
 const authMiddleware = require("../middleware/authMiddleware");
-const playlistRouter = express.Router();
+// const playlistRouter = express.Router();
+const router = require("express").Router();
 
-playlistRouter.post(
-  "/playlist",
+router.post(
+  "/",
   [authMiddleware.secureRoute],
   playlistController.createPlaylist
 );
 
-playlistRouter.put("/playlist/:id", [authMiddleware.secureRoute], playlistController.getPlaylist)
+router.put(
+  "/:id",
+  [authMiddleware.secureRoute],
+  playlistController.editPlaylist
+);
 
-playlistRouter.get("/playlist/:id", [authMiddleware.secureRoute], playlistController.getPlaylistById)
+router.get(
+  "/:id",
+  [authMiddleware.secureRoute],
+  playlistController.getPlaylistById
+);
 
-playlistRouter.get("/userplaylists", [authMiddleware.secureRoute], playlistController.getAllUserPlaylists)
+router.get(
+  "/user",
+  [authMiddleware.secureRoute],
+  playlistController.getAllUserPlaylists
+);
 
-playlistRouter.get("/allplaylists", [authMiddleware.secureRoute], playlistController.getAllPlaylists)
+router.get(
+  "/all",
+  [authMiddleware.secureRoute],
+  playlistController.getAllPlaylists
+);
 
-playlistRouter.delete("/:id", [authMiddleware.secureRoute], playlistController.deletePlaylistById)
+router.delete(
+  "/:id",
+  [authMiddleware.secureRoute],
+  playlistController.deletePlaylistById
+);
 
-playlistRouter.put("/add-song/:id", [authMiddleware.secureRoute], playlistController.addSongToPlaylist)
+router.put(
+  "/add-song/:id",
+  [authMiddleware.secureRoute],
+  playlistController.addSongToPlaylist
+);
 
-playlistRouter.put("/remove-song/:id", [authMiddleware.secureRoute], playlistController.removeSongFromPlaylist)
+router.put(
+  "/remove-song/:id",
+  [authMiddleware.secureRoute],
+  playlistController.removeSongFromPlaylist
+);
 
-
-module.exports = playlistRouter;
+module.exports = router;

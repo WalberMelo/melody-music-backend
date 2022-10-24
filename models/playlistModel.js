@@ -46,24 +46,27 @@ const playlistSchema = new mongoose.Schema(
     tracks: [
       {
         trackId: { type: String, ref: "tracks" },
-        
       },
     ],
     followedBy: [{ type: String }],
   },
   {
     timestamps: true,
+  },
+  {
+    versionKey: false,
   }
 );
 
-const validate = (playlist) => {
+const validatePlaylist = (playlist) => {
   const schema = Joi.object({
-    name: Joi.string().min(2).max(10).required(),
+    name: Joi.string().min(2).max(30).required(),
     description: Joi.string().min(2).max(30).required(),
+    publicAccessible: Joi.boolean().required(),
   });
   return schema.validate(playlist);
 };
 
 const Playlist = mongoose.model("playlists", playlistSchema);
 
-module.exports = { Playlist, validate };
+module.exports = { Playlist, validatePlaylist };

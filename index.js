@@ -1,11 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./db");
-const userRouter = require("./routes/userRoutes");
-const adminRouter = require("./routes/adminRoutes");
-const playlistRouter = require("./routes/playlistRoutes");
-const songRouter = require("./routes/songRoutes");
-const authMiddleware = require("./middleware/authMiddleware");
 const port = 3000;
 const app = express();
 
@@ -22,11 +17,12 @@ app.use(
   })
 );
 
-//End-Points
-app.use(userRouter);
-app.use(adminRouter);
-app.use(playlistRouter);
-app.use(songRouter);
+// Routes
+app.use("/admin", require("./routes/userRoutes"));
+app.use("/user", require("./routes/userRoutes"));
+app.use("/song", require("./routes/songRoutes"));
+app.use("/playlist", require("./routes/playlistRoutes"));
+app.use("/cloud", require("./routes/cloudinaryRoutes"));
 
 app.listen(port),
   console.log(`Server is running Port http://localhost:${port}`);
