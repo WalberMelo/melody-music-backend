@@ -240,7 +240,7 @@ async function sendEmail(req, res) {
         },
       });
 
-      const url = "https://melody-music-stream-ten.vercel.app";
+      const url = "https://melodystream.herokuapp.com";
       const data = {
         from: "noreply@melody.com",
         to: email,
