@@ -5,7 +5,13 @@ const router = require("express").Router();
 
 router.post("/", [authMiddleware.secureRoute], songController.createSong);
 
-router.get("/all", [authMiddleware.secureRoute], songController.getAllSongs);
+router.get(
+  "/all-user-songs",
+  [authMiddleware.secureRoute],
+  songController.getAllUserSongs
+);
+
+router.get("/all-songs", songController.getAllSongs);
 
 router.put("/:id", [authMiddleware.secureRoute], songController.updateSong);
 
