@@ -141,40 +141,47 @@ async function putUser(req, res) {
             msg: "Error: unauthorized request",
           });
         } else {
+          userData.name = params.name;
+          userData.lastName = params.lastName;
+          userData.email = params.email;
+          userData.gender = params.gender;
+          userData.avatar = params.avatar;
+          userData.birthday = params.birthday;
           const checkOldPassword = await bcryptjs.compare(
             params.oldPassword,
             userData.password
           );
-          console.log(checkOldPassword);
-
           const salt = bcryptjs.genSaltSync(10);
-          // replace old info with the new info received
 
-          userData = validate(params);
+          if (params.password) {
+            if (checkOldPassword) {
+              userData.password = await bcryptjs.hash(params.password, salt);
 
-          userData.value.password = await bcryptjs.hash(params.password, salt);
+              User.findByIdAndUpdate(user_token.id, userData, (err, result) => {
+                if (userData.error !== undefined) {
+                  res.status(403).send({
+                    msg: `Error: Validation error`,
+                  });
+                } else if (err) {
+                  res.status(500).send({
+                    msg: "Server status error",
+                  });
+                } else if (!result) {
+                  res.status(404).send({
+                    msg: "Error: user doesn't exists",
+                  });
+                } else {
+                  res.status(201).send({
+                    msg: "User updated successfully",
+                  });
+                }
+              });
+            } else if (!checkOldPassword) {
+              res.send({ msg: "Error: Old password did not match" });
+            }
+          }
         }
       }
-      User.findByIdAndUpdate(user_token.id, userData.value, (err, result) => {
-        //console.log(userData.value);
-        if (userData.error !== undefined) {
-          res.status(403).send({
-            msg: "Error: validation error",
-          });
-        } else if (err) {
-          res.status(500).send({
-            msg: "Server status error",
-          });
-        } else if (!result) {
-          res.status(404).send({
-            msg: "Error: user doesn't exists",
-          });
-        } else {
-          res.status(201).send({
-            msg: "User updated successfully",
-          });
-        }
-      });
     });
   } catch (error) {
     console.error(error);
