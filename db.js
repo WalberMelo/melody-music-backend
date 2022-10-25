@@ -3,12 +3,6 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-// const dbusername = "berners-lee";
-// const dbpassword = "eBhZoJ8ScylFpoFx";
-// console.log(dbusername, dbpassword);
-// const dbcluster = "melody";
-// const dbname = "melody_stream";
-
 //Atlas MongoDB setup
 const dbusername = process.env.DB_USERNAME;
 const dbpassword = process.env.DB_SECRET_KEY;
