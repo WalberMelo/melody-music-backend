@@ -11,6 +11,7 @@ const UserSchema = new Schema(
     password: { type: String, required: true },
     resetLink: { type: String, default: "" },
     gender: { type: String, required: true },
+    avatar:{type: String, default:""},
     birthday: { type: String, required: true },
     likedSongs: { type: [String], default: [] },
     playlists: { type: [String], default: [] },
