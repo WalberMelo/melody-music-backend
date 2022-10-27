@@ -3,7 +3,7 @@ const Joi = require("joi");
 
 const songSchema = new mongoose.Schema(
   {
-    name: {
+    title: {
       type: String,
       trim: true,
     },
@@ -45,7 +45,7 @@ const songSchema = new mongoose.Schema(
 
 const validate = (song) => {
   const schema = Joi.object({
-    name: Joi.string().min(2).max(50).required(),
+    title: Joi.string().min(2).max(50).required(),
     artist: Joi.string().min(2).max(30).required(),
     genre: Joi.string().min(2).max(30).required(),
     url: Joi.string().required(),

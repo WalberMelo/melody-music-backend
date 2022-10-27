@@ -72,9 +72,9 @@ async function updateSong(req, res, next) {
     } else if (user_token.id !== song.userId) {
       res.status(403).send({ msg: "Error: unauthorized request" });
     } else {
-      song.name = req.body.name;
-      song.artists = req.body.artists;
-      song.genere = req.body.genere;
+      song.title = req.body.title;
+      song.artist = req.body.artist;
+      song.genre = req.body.genre;
       await song.save();
       res.status(201).send({ msg: "Song updated successfully" });
     }

@@ -11,7 +11,7 @@ const UserSchema = new Schema(
     password: { type: String, required: true },
     resetLink: { type: String, default: "" },
     gender: { type: String, required: true },
-    avatar:{type: String, default:""},
+    avatar: { type: String, default: "" },
     birthday: { type: String, required: true },
     likedSongs: { type: [String], default: [] },
     playlists: { type: [String], default: [] },
@@ -33,6 +33,7 @@ const validate = (user) => {
     password: passwordComplexity().trim().required(),
     birthday: Joi.string().required(),
     gender: Joi.string().valid("male", "female", "non-binary").required(),
+    avatar: Joi.string(),
   });
   return schema.validate(user);
 };
