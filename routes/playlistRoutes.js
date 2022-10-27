@@ -51,4 +51,8 @@ router.put(
   playlistController.removeSongFromPlaylist
 );
 
+router.put("/follow-playlist/:id", [authMiddleware.secureRoute], playlistController.followPlaylist)
+
+
+
 module.exports = router;

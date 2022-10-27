@@ -232,6 +232,42 @@ async function deletePlaylistById(req, res) {
   }
 }
 
+async function followPlaylist(req, res) {
+
+  const playlist = await Playlist.findById(req.params.id)
+  const user_token = await authMiddleware.getUser(req, res);
+  const user = await User.findById(user_token.id)
+  const index_user = user.playlists.indexOf(playlist._id)
+  const index_playlist = playlist.followedBy.indexOf(user._id)
+
+  try {
+    if (!playlist) {
+      res.status(404).send({
+        msg: "Error: Playlist doesn't exist"
+      })
+    } else {
+      if (index_user === -1 && index_playlist === -1) {
+        user.playlists.push(playlist._id)
+        playlist.followedBy.push(user._id)
+        res.status(200).send({
+          msg: "Added to your Playlists"
+        })
+      } else {
+        user.playlists.splice(index_playlist, 1);
+        playlist.followedBy.splice(index_user, 1)
+        res.status(201).send({
+          msg: "Removed from your playlist"
+        })
+      }
+      await user.save()
+      await playlist.save()
+    }
+  } catch (error) {
+    res.status(500).send(error)
+  }
+
+}
+
 module.exports = {
   createPlaylist,
   editPlaylist,
@@ -241,4 +277,5 @@ module.exports = {
   getPlaylistById,
   addSongToPlaylist,
   removeSongFromPlaylist,
+  followPlaylist
 };
