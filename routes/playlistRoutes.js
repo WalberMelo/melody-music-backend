@@ -3,7 +3,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = require("express").Router();
 
-router.get("random/playlist", playlistController.getRandomPlaylists)
+router.get("/random/music", playlistController.getRandomPlaylists)
 
 
 router.post(
