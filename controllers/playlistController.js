@@ -268,6 +268,26 @@ async function followPlaylist(req, res) {
 
 }
 
+async function getRandomPlaylists(req, res) {
+  
+  const playlists = await Playlist.aggregate([{$sample:{size:6}}]);
+ 
+  try {
+    if (!playlists) {
+      res.status(404).send({
+        msg: "Error: Playlist doesn't exist"
+      })
+    }  else {
+      res.status(200).send({
+        data: playlists,
+        msg: "these are some random playlists"
+      })
+    }
+  } catch (error) {
+    res.status(500).send(error)
+  }
+}
+
 module.exports = {
   createPlaylist,
   editPlaylist,
@@ -277,5 +297,6 @@ module.exports = {
   getPlaylistById,
   addSongToPlaylist,
   removeSongFromPlaylist,
-  followPlaylist
+  followPlaylist,
+  getRandomPlaylists
 };

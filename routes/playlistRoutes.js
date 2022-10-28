@@ -1,7 +1,10 @@
 const playlistController = require("../controllers/playlistController");
 const authMiddleware = require("../middleware/authMiddleware");
-// const playlistRouter = express.Router();
+
 const router = require("express").Router();
+
+router.get("random/playlist", playlistController.getRandomPlaylists)
+
 
 router.post(
   "/",
@@ -53,6 +56,7 @@ router.put(
 );
 
 router.put("/follow-playlist/:id", [authMiddleware.secureRoute], playlistController.followPlaylist)
+
 
 
 
