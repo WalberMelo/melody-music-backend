@@ -171,7 +171,7 @@ async function getAllUserPlaylists(req, res) {
     } else {
       res
         .status(200)
-        .send({ data: playlists, msg: "these are all you playlists" });
+        .send({ data: playlists, msg: "these are all your playlists" });
     }
   } catch (error) {
     res.status(500).send(error);

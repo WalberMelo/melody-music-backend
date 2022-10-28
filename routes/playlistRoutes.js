@@ -14,21 +14,22 @@ router.put(
   [authMiddleware.secureRoute],
   playlistController.editPlaylist
 );
-
 router.get(
   "/:id",
   [authMiddleware.secureRoute],
   playlistController.getPlaylistById
 );
-
 router.get(
-  "/user",
+  "/user/playlist",
   [authMiddleware.secureRoute],
   playlistController.getAllUserPlaylists
 );
 
+
+
+
 router.get(
-  "/all",
+  "/all/playlist",
   [authMiddleware.secureRoute],
   playlistController.getAllPlaylists
 );

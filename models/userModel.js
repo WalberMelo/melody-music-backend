@@ -12,7 +12,7 @@ const UserSchema = new Schema(
     resetLink: { type: String, default: "" },
     gender: { type: String, required: true },
     avatar: { type: String, default: "" },
-    birthday: { type: String, required: true },
+    birthday: { type: String },
     likedSongs: { type: [String], default: [] },
     playlists: { type: [String], default: [] },
     isAdmin: { type: Boolean, default: false },
