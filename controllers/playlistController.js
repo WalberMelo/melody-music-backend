@@ -4,6 +4,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const { Song } = require("../models/songModel");
 
 async function createPlaylist(req, res) {
+  console.log(req.body);
   const params = validatePlaylist(req.body);
 
   const { user } = req;
@@ -57,6 +58,7 @@ async function editPlaylist(req, res, next) {
     } else {
       playlist.name = req.body.name;
       playlist.description = req.body.description;
+      playlist.publicAccessible = req.body.publicAccessible;
       playlist.thumbnail = req.body.thumbnail;
 
       await playlist.save();
@@ -134,7 +136,7 @@ async function removeSongFromPlaylist(req, res) {
 
 // get playlist by id
 
-async function getPlaylistById(req, res, next) {
+async function getPlaylistById(req, res) {
   const playlist = await Playlist.findById(req.params.id);
   const user_token = await authMiddleware.getUser(req, res);
   try {
@@ -147,10 +149,15 @@ async function getPlaylistById(req, res, next) {
         msg: "Forbiden -- Access to this resource on the server is denied!",
       });
     } else {
-      const tracks = playlist.tracks;
+      const playlist = {
+        title: playlist.tracks,
+        description: playlist.description,
+        image: playlist.thumbnail,
+        isPublic: playlist.publicAccessible,
+      };
       res
         .status(200)
-        .send({ tracks, msg: "These are the traks in your playlist" });
+        .send({ playlist, msg: "These are the tracks in your playlist" });
     }
   } catch (error) {
     res.status(500).send(error);
@@ -162,7 +169,6 @@ async function getPlaylistById(req, res, next) {
 async function getAllUserPlaylists(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlists = await Playlist.find({ userId: user_token.id });
-  console.log(playlists);
   try {
     if (!playlists) {
       res.status(404).send({
@@ -233,58 +239,55 @@ async function deletePlaylistById(req, res) {
 }
 
 async function followPlaylist(req, res) {
-
-  const playlist = await Playlist.findById(req.params.id)
+  const playlist = await Playlist.findById(req.params.id);
   const user_token = await authMiddleware.getUser(req, res);
-  const user = await User.findById(user_token.id)
-  const index_user = user.playlists.indexOf(playlist._id)
-  const index_playlist = playlist.followedBy.indexOf(user._id)
+  const user = await User.findById(user_token.id);
+  const index_user = user.playlists.indexOf(playlist._id);
+  const index_playlist = playlist.followedBy.indexOf(user._id);
 
   try {
     if (!playlist) {
       res.status(404).send({
-        msg: "Error: Playlist doesn't exist"
-      })
+        msg: "Error: Playlist doesn't exist",
+      });
     } else {
       if (index_user === -1 && index_playlist === -1) {
-        user.playlists.push(playlist._id)
-        playlist.followedBy.push(user._id)
+        user.playlists.push(playlist._id);
+        playlist.followedBy.push(user._id);
         res.status(200).send({
-          msg: "Added to your Playlists"
-        })
+          msg: "Added to your Playlists",
+        });
       } else {
         user.playlists.splice(index_playlist, 1);
-        playlist.followedBy.splice(index_user, 1)
+        playlist.followedBy.splice(index_user, 1);
         res.status(201).send({
-          msg: "Removed from your playlist"
-        })
+          msg: "Removed from your playlist",
+        });
       }
-      await user.save()
-      await playlist.save()
+      await user.save();
+      await playlist.save();
     }
   } catch (error) {
-    res.status(500).send(error)
+    res.status(500).send(error);
   }
-
 }
 
 async function getRandomPlaylists(req, res) {
-  
-  const playlists = await Playlist.aggregate([{$sample:{size:6}}]);
- 
+  const playlists = await Playlist.aggregate([{ $sample: { size: 6 } }]);
+
   try {
     if (!playlists) {
       res.status(404).send({
-        msg: "Error: Playlist doesn't exist"
-      })
-    }  else {
+        msg: "Error: Playlist doesn't exist",
+      });
+    } else {
       res.status(200).send({
         data: playlists,
-        msg: "these are some random playlists"
-      })
+        msg: "these are some random playlists",
+      });
     }
   } catch (error) {
-    res.status(500).send(error)
+    res.status(500).send(error);
   }
 }
 
@@ -298,5 +301,5 @@ module.exports = {
   addSongToPlaylist,
   removeSongFromPlaylist,
   followPlaylist,
-  getRandomPlaylists
+  getRandomPlaylists,
 };

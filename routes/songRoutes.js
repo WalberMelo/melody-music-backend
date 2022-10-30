@@ -12,12 +12,10 @@ router.get(
 );
 
 router.get("/all-songs", songController.getAllSongs);
-
-router.put("/:id", [authMiddleware.secureRoute], songController.updateSong);
+router.get("/like", [authMiddleware.secureRoute], songController.getLikedSongs);
 
 router.put("/like/:id", [authMiddleware.secureRoute], songController.likeSong);
-
-router.get("/like", [authMiddleware.secureRoute], songController.getLikedSongs);
+router.put("/:id", [authMiddleware.secureRoute], songController.updateSong);
 
 router.delete("/:id", [authMiddleware.secureRoute], songController.deleteSong);
 
