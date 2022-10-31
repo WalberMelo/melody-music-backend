@@ -64,7 +64,6 @@ const validatePlaylist = (playlist) => {
     name: Joi.string().min(2).max(30).required(),
     description: Joi.string().min(2).max(30).required(),
     publicAccessible: Joi.boolean().required(),
-    thumbnail: Joi.string(),
   });
   return schema.validate(playlist);
 };
