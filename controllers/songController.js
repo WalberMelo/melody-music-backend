@@ -90,23 +90,23 @@ async function likeSong(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const user = await User.findById(user_token.id);
   const index_user = user.likedSongs.indexOf(song._id);
-  //const index_song = song.likedBy.indexOf(user._id);
+  const index_song = song.likedBy.indexOf(user._id);
 
   try {
     if (!song) {
       res.status(404).send({ msg: "Song not found" });
     } else {
-      if (index_user === -1 ) {
+      if (index_user === -1 && index_playlist === -1) {
         user.likedSongs.push(song._id);
-        //song.likedBy.push(user._id);
+        song.likedBy.push(user._id);
         res.status(200).send({ msg: "Added to liked songs" });
       } else {
         user.likedSongs.splice(index_song, 1);
-       // song.likedBy.splice(index_user, 1);
+       song.likedBy.splice(index_user, 1);
         res.status(201).send({ msg: "Removed from your liked songs" });
       }
       await user.save();
-      //await song.save();
+      await song.save();
     }
   } catch (error) {
     res.status(500).send(error);
