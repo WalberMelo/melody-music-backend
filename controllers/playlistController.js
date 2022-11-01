@@ -157,10 +157,26 @@ async function getPlaylistById(req, res) {
         image: playlist.thumbnail,
         isPublic: playlist.publicAccessible,
       };
-      console.log(playlistId);
-      res
-        .status(200)
-        .send({ playlist, msg: "These are the tracks in your playlist" });
+      const tracksId = playlistData.tracks.map((element) => {
+        return element._id.valueOf();
+      });
+
+      console.log(tracksId);
+
+      const songs = await Song.find({
+        _id: {
+          $in: tracksId,
+        },
+      });
+
+      console.log(playlistData);
+      console.log(songs);
+
+      res.status(200).send({
+        playlistInfo: playlistData,
+        songs: songs,
+        msg: "Playlist information",
+      });
     }
   } catch (error) {
     console.log(error);
@@ -294,7 +310,6 @@ async function getRandomPlaylists(req, res) {
     res.status(500).send(error);
   }
 }
-
 
 module.exports = {
   createPlaylist,
