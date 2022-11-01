@@ -149,12 +149,14 @@ async function getPlaylistById(req, res) {
         msg: "Forbiden -- Access to this resource on the server is denied!",
       });
     } else {
-      const playlist = {
+      
+      const playlistId = {
         title: playlist.tracks,
         description: playlist.description,
         image: playlist.thumbnail,
         isPublic: playlist.publicAccessible,
       };
+      console.log(playlistId);
       res
         .status(200)
         .send({ playlist, msg: "These are the tracks in your playlist" });
