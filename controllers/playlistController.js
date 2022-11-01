@@ -70,14 +70,16 @@ async function editPlaylist(req, res, next) {
 }
 
 // Add song to playlist
-//? Need to create song modal before finishing fuction
+//? Need to create song modal before finishing function
 
 async function addSongToPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
-
-  const song = await Song.findById(req.body);
-  const tracks = playlist.tracks.map((track) => track._id.toString());
+  const songId = req.body.song_id;
+  const song = await Song.findById(songId);
+  // const track = playlist.tracks.map((track) => console.log(track));
+  // console.log(track);
+  const tracks = playlist.tracks.map((track) => track?._id.toString());
 
   try {
     if (!playlist) {
@@ -86,17 +88,17 @@ async function addSongToPlaylist(req, res) {
       });
     } else if (user_token.id !== playlist.userId) {
       res.status(403).send({
-        msg: "Forbiden -- Access to this resource on the server is denied!",
+        msg: "Forbidden -- Access to this resource on the server is denied!",
       });
     } else if (!song || song === null) {
       res.status(404).send({ msg: "Error: Song doesn't exist'" });
-    } else if (tracks.indexOf(req.body._id) !== -1) {
+    } else if (tracks.indexOf(songId) !== -1) {
       res.status(501).send({ msg: "Error: Song already in playlist" });
-    } else if (tracks.indexOf(req.body._id) === -1) {
-      playlist.tracks.push(req.body._id);
+    } else if (tracks.indexOf(songId) === -1) {
+      playlist.tracks.push(songId);
 
       await playlist.save();
-      res.status(200).send({ data: playlist, message: "Added to playlist" });
+      res.status(200).send({ msg: "Added to playlist" });
     }
   } catch (error) {
     res.status(500).send(error);
@@ -146,12 +148,11 @@ async function getPlaylistById(req, res) {
       });
     } else if (user_token.id !== playlist.userId) {
       res.status(403).send({
-        msg: "Forbiden -- Access to this resource on the server is denied!",
+        msg: "Forbidden -- Access to this resource on the server is denied!",
       });
     } else {
-      
-      const playlistId = {
-        title: playlist.tracks,
+      const playlistData = {
+        tracks: playlist.tracks,
         description: playlist.description,
         image: playlist.thumbnail,
         isPublic: playlist.publicAccessible,
@@ -162,6 +163,7 @@ async function getPlaylistById(req, res) {
         .send({ playlist, msg: "These are the tracks in your playlist" });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 }
