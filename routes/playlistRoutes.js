@@ -3,44 +3,27 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = require("express").Router();
 
-router.get("/random/music", playlistController.getRandomPlaylists)
-
-
-router.post(
-  "/",
+router.get("/random/music", playlistController.getRandomPlaylists);
+router.get(
+  "/user/playlist",
   [authMiddleware.secureRoute],
-  playlistController.createPlaylist
+  playlistController.getAllUserPlaylists
 );
-
-router.put(
-  "/:id",
+router.get(
+  "/all/playlist",
   [authMiddleware.secureRoute],
-  playlistController.editPlaylist
+  playlistController.getAllPlaylists
 );
 router.get(
   "/:id",
   [authMiddleware.secureRoute],
   playlistController.getPlaylistById
 );
-router.get(
-  "/user/playlist",
+
+router.post(
+  "/create",
   [authMiddleware.secureRoute],
-  playlistController.getAllUserPlaylists
-);
-
-
-
-
-router.get(
-  "/all/playlist",
-  [authMiddleware.secureRoute],
-  playlistController.getAllPlaylists
-);
-
-router.delete(
-  "/:id",
-  [authMiddleware.secureRoute],
-  playlistController.deletePlaylistById
+  playlistController.createPlaylist
 );
 
 router.put(
@@ -48,16 +31,26 @@ router.put(
   [authMiddleware.secureRoute],
   playlistController.addSongToPlaylist
 );
-
 router.put(
   "/remove-song/:id",
   [authMiddleware.secureRoute],
   playlistController.removeSongFromPlaylist
 );
+router.put(
+  "/follow-playlist/:id",
+  [authMiddleware.secureRoute],
+  playlistController.followPlaylist
+);
+router.put(
+  "/edit/:id",
+  [authMiddleware.secureRoute],
+  playlistController.editPlaylist
+);
 
-router.put("/follow-playlist/:id", [authMiddleware.secureRoute], playlistController.followPlaylist)
-
-
-
+router.delete(
+  "/:id",
+  [authMiddleware.secureRoute],
+  playlistController.deletePlaylistById
+);
 
 module.exports = router;

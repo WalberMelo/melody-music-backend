@@ -28,7 +28,7 @@ const UserSchema = new Schema(
 const validate = (user) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(10).trim().required(),
-    lastName: Joi.string().min().max(10).trim().required(),
+    lastName: Joi.string().min(2).max(10).trim().required(),
     email: Joi.string().lowercase().trim().email(),
     password: passwordComplexity().trim().required(),
     birthday: Joi.string().required(),

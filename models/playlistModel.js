@@ -19,7 +19,8 @@ const playlistSchema = new mongoose.Schema(
     thumbnail: {
       type: String,
       trim: true,
-      default: "http://res.cloudinary.com/dzfouunnx/image/upload/v1666973633/melody/thumbnail/cf7c34a044584bd3d1c4e0f0d084a974_aqoe91.jpg",
+      default:
+        "http://res.cloudinary.com/dzfouunnx/image/upload/v1666973633/melody/thumbnail/cf7c34a044584bd3d1c4e0f0d084a974_aqoe91.jpg",
     },
     publicAccessible: {
       type: Boolean,

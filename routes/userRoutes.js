@@ -4,9 +4,9 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = require("express").Router();
 
+router.get("/", [authMiddleware.secureRoute], userController.getUser);
 router.post("/register", userController.postUser);
 router.post("/login", userController.login);
-router.get("/", [authMiddleware.secureRoute], userController.getUser);
 router.put("/", [authMiddleware.secureRoute], userController.putUser);
 router.delete("/", [authMiddleware.secureRoute], userController.deleteUser);
 
