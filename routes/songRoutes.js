@@ -13,6 +13,7 @@ router.get(
 
 router.get("/all-songs", songController.getAllSongs);
 router.get("/like", [authMiddleware.secureRoute], songController.getLikedSongs);
+router.get("/select/:id", songController.getSongById);
 
 router.put("/like/:id", [authMiddleware.secureRoute], songController.likeSong);
 router.put("/:id", [authMiddleware.secureRoute], songController.updateSong);

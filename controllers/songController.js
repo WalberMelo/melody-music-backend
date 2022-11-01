@@ -44,6 +44,27 @@ async function getAllUserSongs(req, res) {
   }
 }
 
+// Get songs by Id
+async function getSongById(req, res) {
+  console.log(req.params.id);
+  try {
+    const songs = await Song.find({
+      _id: {
+        $in: req.params.id,
+      },
+    });
+
+    if (!songs) {
+      res.status(404).send({ msg: "Error no songs found" });
+    } else {
+      res.status(200).send({ songs });
+      console.log(songs);
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
+
 // Get all songs in data base
 async function getAllSongs(req, res) {
   try {
@@ -84,7 +105,6 @@ async function updateSong(req, res, next) {
 }
 
 // Liked song
-
 async function likeSong(req, res) {
   const song = await Song.findById(req.params.id);
   const user_token = await authMiddleware.getUser(req, res);
@@ -163,4 +183,5 @@ module.exports = {
   likeSong,
   getLikedSongs,
   deleteSong,
+  getSongById,
 };
