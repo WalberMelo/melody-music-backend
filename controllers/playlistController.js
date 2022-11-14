@@ -110,7 +110,8 @@ async function addSongToPlaylist(req, res) {
 async function removeSongFromPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
-  const song = await Song.findById(req.body);
+  const { songsId } = req.body;
+  const song = await Song.findById(songsId);
 
   try {
     if (!playlist) {
@@ -119,17 +120,25 @@ async function removeSongFromPlaylist(req, res) {
       });
     } else if (user_token.id !== playlist.userId) {
       res.status(403).send({
-        msg: "Forbiden -- Access to this resource on the server is denied!",
+        msg: "Forbidden -- Access to this resource on the server is denied!",
       });
     } else if (!song || song === null) {
       res.status(404).send({ msg: "Error: Song doesn't exist'" });
     } else {
-      const index = playlist.tracks.indexOf(req.body.trackId);
-      playlist.tracks.splice(index, 1);
+      const track = await Playlist.findById(req.params.id, {
+        ["tracks"]: { $elemMatch: { _id: songsId } },
+      });
+
+      if (track) {
+        await Playlist.findByIdAndUpdate(
+          req.params.id,
+          { $pull: { ["tracks"]: { _id: songsId } } },
+          { new: true, multi: false }
+        );
+      }
+
       await playlist.save();
-      res
-        .status(200)
-        .send({ data: playlist, message: "Removed from playlist" });
+      res.status(200).send({ data: playlist, msg: "Removed from playlist" });
     }
   } catch (error) {
     res.status(500).send(error);
@@ -152,6 +161,8 @@ async function getPlaylistById(req, res) {
       });
     } else {
       const playlistData = {
+        id: playlist._id,
+        name: playlist.name,
         tracks: playlist.tracks,
         description: playlist.description,
         image: playlist.thumbnail,
