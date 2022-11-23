@@ -3,7 +3,6 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = require("express").Router();
 
-router.get("/random/music", playlistController.getRandomPlaylists);
 router.get(
   "/user/playlist",
   [authMiddleware.secureRoute],
@@ -14,6 +13,9 @@ router.get(
   [authMiddleware.secureRoute],
   playlistController.getAllPlaylists
 );
+router.get("/public", playlistController.getPublicPlaylists);
+router.get("/public/:id", playlistController.getPublicPlaylistById);
+
 router.get(
   "/:id",
   [authMiddleware.secureRoute],

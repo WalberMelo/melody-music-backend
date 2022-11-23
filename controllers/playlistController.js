@@ -38,8 +38,6 @@ async function createPlaylist(req, res) {
   }
 }
 
-//edit playlist by id (edit basic parameters not to add mor songs on playlist)
-
 async function editPlaylist(req, res, next) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
@@ -68,9 +66,6 @@ async function editPlaylist(req, res, next) {
     res.status(500).send(error);
   }
 }
-
-// Add song to playlist
-//? Need to create song modal before finishing function
 
 async function addSongToPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
@@ -104,8 +99,6 @@ async function addSongToPlaylist(req, res) {
     res.status(500).send(error);
   }
 }
-
-//remove song from playlist
 
 async function removeSongFromPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
@@ -145,8 +138,6 @@ async function removeSongFromPlaylist(req, res) {
   }
 }
 
-// get playlist by id
-
 async function getPlaylistById(req, res) {
   const playlist = await Playlist.findById(req.params.id);
   const user_token = await authMiddleware.getUser(req, res);
@@ -172,8 +163,6 @@ async function getPlaylistById(req, res) {
         return element._id.valueOf();
       });
 
-      console.log(tracksId);
-
       const songs = await Song.find({
         _id: {
           $in: tracksId,
@@ -195,7 +184,43 @@ async function getPlaylistById(req, res) {
   }
 }
 
-//get all playlists of the user
+async function getPublicPlaylistById(req, res) {
+  const playlist = await Playlist.findById(req.params.id);
+  try {
+    if (!playlist) {
+      res.status(404).send({
+        msg: "Error: Playlist doesn't exist",
+      });
+    } else {
+      const playlistData = {
+        id: playlist._id,
+        name: playlist.name,
+        tracks: playlist.tracks,
+        description: playlist.description,
+        image: playlist.thumbnail,
+        isPublic: playlist.publicAccessible,
+      };
+      const tracksId = playlistData.tracks.map((element) => {
+        return element._id.valueOf();
+      });
+
+      const songs = await Song.find({
+        _id: {
+          $in: tracksId,
+        },
+      });
+
+      res.status(200).send({
+        playlistInfo: playlistData,
+        songs: songs,
+        msg: "Playlist information",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+}
 
 async function getAllUserPlaylists(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
@@ -215,7 +240,6 @@ async function getAllUserPlaylists(req, res) {
   }
 }
 
-//Get all playlists crated only for admin
 async function getAllPlaylists(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlists = await Playlist.find();
@@ -237,8 +261,6 @@ async function getAllPlaylists(req, res) {
     res.status(500).send(error);
   }
 }
-
-//Delete playlist by id
 
 async function deletePlaylistById(req, res) {
   const playlist = await Playlist.findById(req.params.id);
@@ -303,8 +325,10 @@ async function followPlaylist(req, res) {
   }
 }
 
-async function getRandomPlaylists(req, res) {
-  const playlists = await Playlist.aggregate([{ $sample: { size: 6 } }]);
+async function getPublicPlaylists(req, res) {
+  const playlists = await Playlist.aggregate([
+    { $match: { publicAccessible: true } },
+  ]);
 
   try {
     if (!playlists) {
@@ -329,8 +353,9 @@ module.exports = {
   getAllUserPlaylists,
   deletePlaylistById,
   getPlaylistById,
+  getPublicPlaylistById,
   addSongToPlaylist,
   removeSongFromPlaylist,
   followPlaylist,
-  getRandomPlaylists,
+  getPublicPlaylists,
 };
