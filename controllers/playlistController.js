@@ -42,7 +42,6 @@ async function editPlaylist(req, res, next) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
   console.log(playlist);
-  console.log(user_token);
 
   try {
     if (!playlist) {
