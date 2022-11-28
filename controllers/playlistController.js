@@ -38,10 +38,9 @@ async function createPlaylist(req, res) {
   }
 }
 
-async function editPlaylist(req, res, next) {
+async function editPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
-  console.log(playlist);
 
   try {
     if (!playlist) {
@@ -260,6 +259,27 @@ async function getAllPlaylists(req, res) {
   }
 }
 
+async function getPublicPlaylists(req, res) {
+  const playlists = await Playlist.aggregate([
+    { $match: { publicAccessible: true } },
+  ]);
+
+  try {
+    if (!playlists) {
+      res.status(404).send({
+        msg: "Error: Playlist doesn't exist",
+      });
+    } else {
+      res.status(200).send({
+        data: playlists,
+        msg: "these are some random playlists",
+      });
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
+
 async function deletePlaylistById(req, res) {
   const playlist = await Playlist.findById(req.params.id);
   const user_token = await authMiddleware.getUser(req, res);
@@ -317,27 +337,6 @@ async function followPlaylist(req, res) {
       }
       await user.save();
       await playlist.save();
-    }
-  } catch (error) {
-    res.status(500).send(error);
-  }
-}
-
-async function getPublicPlaylists(req, res) {
-  const playlists = await Playlist.aggregate([
-    { $match: { publicAccessible: true } },
-  ]);
-
-  try {
-    if (!playlists) {
-      res.status(404).send({
-        msg: "Error: Playlist doesn't exist",
-      });
-    } else {
-      res.status(200).send({
-        data: playlists,
-        msg: "these are some random playlists",
-      });
     }
   } catch (error) {
     res.status(500).send(error);

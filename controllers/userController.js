@@ -247,7 +247,7 @@ async function sendEmail(req, res) {
         },
       });
 
-      const url = "https://melodystream.herokuapp.com";
+      const url = "https://melody-music-stream-production.up.railway.app";
       const data = {
         from: "noreply@melody.com",
         to: email,
