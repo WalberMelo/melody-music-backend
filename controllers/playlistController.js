@@ -68,10 +68,12 @@ async function editPlaylist(req, res) {
 async function addSongToPlaylist(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
   const playlist = await Playlist.findById(req.params.id);
-  const song = await Song.findById(req.body.songsId);
-  console.log("mongodb song: ", song);
+  //console.log("mongodb playlist: ", playlist);
+  const song = await Song.findById(req.body.song_id);
+  //console.log("mongodb song: ", song);
 
   const tracks = playlist.tracks.map((track) => track?._id.toString());
+  //console.log("mongodb tracks: ", tracks);
 
   try {
     if (!playlist) {
@@ -84,10 +86,10 @@ async function addSongToPlaylist(req, res) {
       });
     } else if (!song || song === null) {
       res.status(404).send({ msg: "Error: Song doesn't exist'" });
-    } else if (tracks.indexOf(req.body.songsId) !== -1) {
+    } else if (tracks.indexOf(req.body.song_id) !== -1) {
       res.status(501).send({ msg: "Error: Song already in playlist" });
-    } else if (tracks.indexOf(req.body.songsId) === -1) {
-      playlist.tracks.push(req.body.songsId);
+    } else if (tracks.indexOf(req.body.song_id) === -1) {
+      playlist.tracks.push(req.body.song_id);
 
       await playlist.save();
       res.status(200).send({ msg: "Added to playlist" });
@@ -136,7 +138,9 @@ async function removeSongFromPlaylist(req, res) {
 }
 
 async function getPlaylistById(req, res) {
+  console.log(req.params.id);
   const playlist = await Playlist.findById(req.params.id);
+  console.log(playlist);
   const user_token = await authMiddleware.getUser(req, res);
   try {
     if (!playlist) {
