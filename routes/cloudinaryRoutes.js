@@ -1,7 +1,5 @@
-const express = require("express");
 const upload = require("../middleware/multer");
 const cloudinaryController = require("../controllers/cloudinaryController");
-// const cloudinaryRouter = express.Router();
 const router = require("express").Router();
 
 router.post(
@@ -13,6 +11,12 @@ router.post(
   "/uploadthumbnail",
   upload.single("thumbnail"),
   cloudinaryController.cloudinaryThumbnailUploader
+);
+
+router.post(
+  "/avatar",
+  upload.single("avatar"),
+  cloudinaryController.cloudinaryAvatarUploader
 );
 
 module.exports = router;
