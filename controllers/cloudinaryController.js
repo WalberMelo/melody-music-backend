@@ -60,7 +60,7 @@ async function cloudinaryAvatarUploader(req, res) {
       crop: "fill",
     })
     .then((result) => {
-      res.send({ image: result.url });
+      res.send({ image: result });
     })
     .catch((error) => {
       console.log(error);
