@@ -240,7 +240,7 @@ async function sendEmail(req, res) {
         msg: "User with this email doesn't exists",
       });
     } else {
-      const token = jwt.createToken(user, "30m");
+      const token = jwt.createToken(user, "60m");
       let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -255,11 +255,11 @@ async function sendEmail(req, res) {
       const data = {
         from: "noreply@melody.com",
         to: email,
-        subject: "Reset Account Password Link",
+        subject: "Password Reset Account",
         html: `
         <h3>You requested to reset your password.</h3>
         <h3>Please click the link bellow to reset your password</h3>
-    <p>${url}/resetpassword/${token}</p>`,
+    <p>${url}/user/resetpassword/${token}</p>`,
       };
 
       await User.updateOne({ resetLink: token }, (err) => {
@@ -271,7 +271,8 @@ async function sendEmail(req, res) {
               return res.status(400).send({ error: error.message });
             }
             return res.status(200).send({
-              message: "Email has been sent, please follow the instructions",
+              message:
+                "Email has been sent, please follow the instructions. Please, if email does not arrive after 15 minutes repeat the process.",
             });
           });
         }
@@ -284,8 +285,6 @@ async function sendEmail(req, res) {
 
 async function resetPassword(req, res) {
   const user_token = await authMiddleware.recoveryPasswordToken(req, res);
-  console.log(user_token);
-  //!Check invalid token
   if (!user_token) {
     return res.status(400).send("Invalid link or expired");
   } else return res.status(200).send(req.user_token);
