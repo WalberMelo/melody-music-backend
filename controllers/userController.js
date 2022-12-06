@@ -12,39 +12,44 @@ async function postUser(req, res) {
   const user = new User(params.value);
 
   try {
-    if (params.error)
+    if (params.error) {
       throw {
         msg: `${params.error}`,
       };
+    }
     //require email and password
-    if (!params.value.email)
+    if (!params.value.email) {
       throw {
         msg: "Error: email can not be null",
       };
-    if (!params.value.password)
+    }
+
+    if (!params.value.password) {
       throw {
         msg: "Error: password can not be null",
       };
+    }
 
     //Avoid duplicated emails
     const emailExists = await User.findOne({
       email: params.value.email,
     });
-    if (emailExists)
+    if (emailExists) {
       throw {
         msg: "Email already exists",
       };
+    }
 
     // encrypting password
     const salt = bcryptjs.genSaltSync(10);
     user.password = await bcryptjs.hash(params.value.password, salt);
-
     user.save();
+    const token = await jwt.createToken(user, "24h");
     res.status(201).send({
-      user: user,
+      token: token,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send(error.msg);
   }
 }
 
@@ -190,7 +195,6 @@ async function putUser(req, res) {
 
 async function deleteUser(req, res) {
   const user_token = await authMiddleware.getUser(req, res);
-  console.log(user_token);
 
   try {
     User.findById(user_token.id, (err, userData) => {

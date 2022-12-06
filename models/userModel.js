@@ -33,7 +33,6 @@ const validate = (user) => {
     password: passwordComplexity().trim().required(),
     birthday: Joi.string().required(),
     gender: Joi.string().valid("male", "female", "non-binary").required(),
-    avatar: Joi.string(),
   });
   return schema.validate(user);
 };
