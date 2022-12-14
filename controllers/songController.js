@@ -106,11 +106,10 @@ async function updateSong(req, res, next) {
 
 // Liked song
 async function likeSong(req, res) {
-  const song = await Song.findById(req.params.id);
   const user_token = await authMiddleware.getUser(req, res);
   const user = await User.findById(user_token.id);
+  const song = await Song.findById(req.params.id);
   const index_user = user.likedSongs.indexOf(song._id);
-  const index_song = song.likedBy.indexOf(user._id);
 
   try {
     if (!song) {
@@ -121,9 +120,18 @@ async function likeSong(req, res) {
         song.likedBy.push(user._id);
         res.status(200).send({ msg: "Added to liked songs" });
       } else {
-        user.likedSongs.splice(index_song, 1);
+        await Song.findByIdAndUpdate(
+          req.params.id,
+          { $pull: { likedBy: user_token.id } },
+          { new: true, multi: false }
+        );
 
-        song.likedBy.splice(index_user, 1);
+        await User.findByIdAndUpdate(
+          user_token.id,
+          { $pull: { likedSongs: req.params.id } },
+          { new: true, multi: false }
+        );
+
         res.status(201).send({ msg: "Removed from your liked songs" });
       }
       await user.save();
