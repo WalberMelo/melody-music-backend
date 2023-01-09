@@ -9,7 +9,7 @@ const port = process.env.PORT || 4000;
 
 //Connect to Data Base
 connectDB();
-
+//
 // MIDDLEWARE & STATIC
 app.use(express.static("public"));
 app.use(express.json());
