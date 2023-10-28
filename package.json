@@ -1,0 +1,46 @@
+{
+  "name": "melody-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/index.js",
+  "engines": {
+    "node": "16.x"
+  },
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WalberMelo/melody-music-stream.git"
+  },
+  "keywords": [
+    "heroku"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WalberMelo/melody-music-stream/issues"
+  },
+  "homepage": "https://github.com/WalberMelo/melody-music-stream#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.32.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.1",
+    "joi": "^17.6.2",
+    "joi-password-complexity": "^5.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
+    "mongoose": "^6.11.3",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^4.0.0",
+    "netlify-lambda": "^2.0.15",
+    "nodemailer": "^6.8.0",
+    "nodemon": "^2.0.20",
+    "serverless-http": "^3.0.2"
+  },
+  "devDependencies": {
+    "netlify-cli": "^12.12.0"
+  }
+}
